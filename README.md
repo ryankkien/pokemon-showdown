@@ -45,6 +45,7 @@ Edit `.env` with your configuration:
 - `USE_MOCK_LLM`: Set to "false" to use real LLM, "true" for testing
 - `PS_SERVER_URL`: Pokemon Showdown server URL (default: http://localhost:8000)
 - `PS_USERNAME`: Your bot's username
+- `PS_BATTLE_FORMAT`: Battle format to play (default: gen9randombattle)
 
 ### 3. Run with Integrated Server Management
 
@@ -132,6 +133,48 @@ python bot.py
 Test individual components without connecting to a server:
 ```bash
 python test_bot.py
+```
+
+## Playing Different Formats
+
+### Quick Format Selection
+
+Use the convenient format selector script:
+
+```bash
+# Play current generation (Gen 9)
+python play_format.py gen9
+
+# Play classic Red/Blue/Yellow battles  
+python play_format.py gen1
+
+# Play Sword/Shield doubles
+python play_format.py gen8doubles
+
+# Play 10 battles in Diamond/Pearl generation
+python play_format.py gen4 10
+```
+
+### Available Formats
+
+- `gen9` - Current generation (Scarlet/Violet)
+- `gen8` - Sword/Shield generation
+- `gen7` - Ultra Sun/Ultra Moon generation  
+- `gen6` - Omega Ruby/Alpha Sapphire generation
+- `gen5` - Black 2/White 2 generation
+- `gen4` - Diamond/Pearl/Platinum generation
+- `gen3` - Ruby/Sapphire/Emerald generation
+- `gen2` - Gold/Silver/Crystal generation
+- `gen1` - Red/Blue/Yellow generation
+- `gen9doubles` - Current generation doubles
+- `gen8doubles` - Sword/Shield doubles
+
+### Manual Configuration
+
+You can also directly edit the `.env` file:
+
+```bash
+PS_BATTLE_FORMAT=gen1randombattle
 ```
 
 ## How It Works

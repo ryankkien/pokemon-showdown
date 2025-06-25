@@ -30,7 +30,7 @@ class LLMPlayer(Player):
     A Pokemon Showdown player that uses an LLM for decision making.
     """
     
-    def __init__(self, battle_format: str = "gen8randombattle", use_mock_llm: bool = False, **kwargs):
+    def __init__(self, battle_format: str = "gen9randombattle", use_mock_llm: bool = False, **kwargs):
         """
         Initialize the LLM player.
         
@@ -152,10 +152,12 @@ async def main():
     # Get configuration from environment
     username = os.getenv("PS_USERNAME", "LLMBot")
     server_url = os.getenv("PS_SERVER_URL", "http://localhost:8000")
+    battle_format = os.getenv("PS_BATTLE_FORMAT", "gen9randombattle")
     use_mock = os.getenv("USE_MOCK_LLM", "true").lower() == "true"
     
     logger.info(f"Starting LLM bot with username: {username}")
     logger.info(f"Server URL: {server_url}")
+    logger.info(f"Battle format: {battle_format}")
     logger.info(f"Using mock LLM: {use_mock}")
     
     try:
@@ -167,6 +169,7 @@ async def main():
         
         # Create and start the bot
         player = LLMPlayer(
+            battle_format=battle_format,
             max_concurrent_battles=1,
             use_mock_llm=use_mock,
             server_configuration=server_config
