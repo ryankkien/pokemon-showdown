@@ -14,6 +14,7 @@ from datetime import datetime
 from bot_manager import BotManager
 from bot_matchmaker import BotMatchmaker, MatchRequest
 from bot_vs_bot_config import BotVsBotConfigManager, TournamentType, create_quick_battle_config, create_tournament_config
+from leaderboard_server import LeaderboardManager
 
 
 # Global variables for graceful shutdown
@@ -142,6 +143,7 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager):
     # Create components
     manager = BotManager(config_manager.config.server_url)
     matchmaker = BotMatchmaker(manager, config_manager.config.matchmaking_strategy)
+    leaderboard = LeaderboardManager()
     
     try:
         # Create all bots
@@ -177,9 +179,12 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager):
             # Print stats periodically
             current_time = asyncio.get_event_loop().time()
             if current_time - last_stats_print > 120:  # Every 2 minutes
-                leaderboard = matchmaker.get_leaderboard()
+                # Update leaderboard with latest data
+                leaderboard.update_from_matchmaker(matchmaker)
+                
+                leaderboard_data = matchmaker.get_leaderboard()
                 print(f"\n=== Leaderboard (after {len(manager.battle_results)} battles) ===")
-                for i, bot in enumerate(leaderboard[:5], 1):  # Top 5
+                for i, bot in enumerate(leaderboard_data[:5], 1):  # Top 5
                     print(f"{i}. {bot['username']}: ELO {bot['elo_rating']}, "
                           f"Win Rate {bot['win_rate']}% ({bot['wins']}-{bot['losses']}-{bot['draws']})")
                 
@@ -200,8 +205,11 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager):
         
         # Final stats
         print("\n=== Final Results ===")
-        leaderboard = matchmaker.get_leaderboard()
-        for i, bot in enumerate(leaderboard, 1):
+        # Update leaderboard with final data
+        leaderboard.update_from_matchmaker(matchmaker)
+        
+        leaderboard_data = matchmaker.get_leaderboard()
+        for i, bot in enumerate(leaderboard_data, 1):
             print(f"{i}. {bot['username']}: ELO {bot['elo_rating']}, "
                   f"Win Rate {bot['win_rate']}% ({bot['wins']}-{bot['losses']}-{bot['draws']})")
         
@@ -217,7 +225,12 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager):
             stats_filename = f"{config_manager.config.results_dir}/matchmaking_{timestamp}.json"
             matchmaker.save_stats(stats_filename)
             
-            print(f"Results saved to: {battle_filename} and {stats_filename}")
+            # Save leaderboard data
+            leaderboard_filename = f"{config_manager.config.results_dir}/leaderboard_{timestamp}.json"
+            leaderboard.data_file = leaderboard_filename
+            leaderboard.save_data()
+            
+            print(f"Results saved to: {battle_filename}, {stats_filename}, and {leaderboard_filename}")
     
     except Exception as e:
         print(f"Error in continuous matchmaking: {e}")
@@ -247,6 +260,10 @@ async def main():
                        help="Use quick battle configuration")
     parser.add_argument("--verbose", "-v", action="store_true",
                        help="Enable verbose logging")
+    parser.add_argument("--leaderboard", action="store_true",
+                       help="Start web leaderboard server alongside battles")
+    parser.add_argument("--leaderboard-port", type=int, default=5000,
+                       help="Port for leaderboard server")
     
     args = parser.parse_args()
     
@@ -301,6 +318,21 @@ async def main():
     print()
     
     try:
+        # Start leaderboard server if requested
+        leaderboard_thread = None
+        if args.leaderboard:
+            import threading
+            from leaderboard_server import run_server
+            
+            print(f"Starting leaderboard server on port {args.leaderboard_port}...")
+            leaderboard_thread = threading.Thread(
+                target=run_server,
+                args=('localhost', args.leaderboard_port, False),
+                daemon=True
+            )
+            leaderboard_thread.start()
+            print(f"🌐 Leaderboard available at: http://localhost:{args.leaderboard_port}")
+        
         # Run selected mode
         if args.mode == "single":
             await run_single_battle(config_manager)

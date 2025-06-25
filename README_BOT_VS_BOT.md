@@ -24,6 +24,15 @@ python run_bot_vs_bot.py --mode tournament
 python run_bot_vs_bot.py --mode continuous
 ```
 
+### 5. Start Web Leaderboard
+```bash
+# Run with integrated leaderboard
+python run_bot_vs_bot.py --mode continuous --leaderboard
+
+# Or run standalone leaderboard server
+python leaderboard_server.py --data-file demo_leaderboard_data.json
+```
+
 ## 📁 System Components
 
 ### Core Files
@@ -32,6 +41,8 @@ python run_bot_vs_bot.py --mode continuous
 - **`bot_vs_bot_config.py`** - Configuration management for tournaments and battles
 - **`run_bot_vs_bot.py`** - Main script with CLI interface
 - **`test_bot_vs_bot.py`** - Test suite for all components
+- **`leaderboard_server.py`** - Web-based leaderboard with real-time updates
+- **`demo_leaderboard.py`** - Generate sample data for testing
 
 ### Configuration
 - **`bot_vs_bot_config.json`** - Main configuration file (created by --setup)
@@ -100,6 +111,14 @@ TournamentConfig(
 - **ROUND_ROBIN** - Systematic all-vs-all
 
 ## 📊 Analytics & Results
+
+### Real-Time Web Leaderboard
+Interactive web interface featuring:
+- **Live Rankings** - Real-time ELO leaderboards
+- **Battle Statistics** - Win/loss records, battle duration, format distribution
+- **Recent Form** - W/L/D tracking for last 5 battles
+- **Streak Tracking** - Current and longest win streaks
+- **Mobile Responsive** - Works on all devices
 
 ### Battle Statistics
 - Win/Loss records
@@ -181,8 +200,17 @@ python run_bot_vs_bot.py --mode tournament
 
 ### ELO Ladder System
 ```bash
-# Continuous matchmaking with ELO
-python run_bot_vs_bot.py --mode continuous --verbose
+# Continuous matchmaking with ELO and web leaderboard
+python run_bot_vs_bot.py --mode continuous --leaderboard --verbose
+```
+
+### Demo Leaderboard
+```bash
+# Generate sample data and start leaderboard
+python demo_leaderboard.py
+python leaderboard_server.py --data-file demo_leaderboard_data.json
+
+# Then visit: http://localhost:5000
 ```
 
 ### Custom Configuration
