@@ -252,23 +252,31 @@ class MockLLMClient(LLMClient):
         logger.info("Mock LLM client initialized")
     
     async def get_decision(self, prompt: str, max_tokens: int = 150, temperature: float = 0.3) -> LLMResponse:
-        """Return a mock decision."""
+        """Return a mock decision based on available moves in prompt."""
         # Simulate API delay
         await asyncio.sleep(0.1)
         
-        # Simple logic to return different mock responses
-        if "charizard" in prompt.lower():
-            mock_response = """action: move
-value: flamethrower  
-reasoning: Using Fire-type STAB move for good damage"""
-        elif "switch" in prompt.lower() and "available switches" in prompt.lower():
-            mock_response = """action: switch
-value: pikachu
-reasoning: Current Pokemon at low HP, switching to preserve it"""
-        else:
-            mock_response = """action: move
-value: tackle
-reasoning: Using reliable Normal-type move"""
+        # Extract available moves from prompt
+        available_moves = []
+        if "Available moves:" in prompt:
+            moves_section = prompt.split("Available moves:")[1].split("\n")[0]
+            available_moves = [move.strip() for move in moves_section.split(",")]
+        
+        # Choose a reasonable move
+        chosen_move = "tackle"  # fallback
+        if available_moves:
+            # Prefer offensive moves
+            for move in available_moves:
+                move_lower = move.lower()
+                if any(keyword in move_lower for keyword in ["attack", "punch", "slash", "beam", "blast", "storm", "fall", "whip"]):
+                    chosen_move = move
+                    break
+            else:
+                chosen_move = available_moves[0]  # use first available move
+        
+        mock_response = f"""action: move
+value: {chosen_move}
+reasoning: Using available move for battle strategy"""
         
         logger.info(f"Mock LLM response: {mock_response}")
         

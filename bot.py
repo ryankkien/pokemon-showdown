@@ -71,10 +71,22 @@ class LLMPlayer(Player):
             action, value = self._parse_llm_response(llm_response, battle)
             
             # Execute the chosen action
-            if action == "move" and value in [move.id for move in battle.available_moves]:
-                return self.create_order(value)
-            elif action == "switch" and value in [pokemon.species for pokemon in battle.available_switches]:
-                return self.create_order(value)
+            if action == "move":
+                # Find the move object by ID
+                for move in battle.available_moves:
+                    if move.id == value:
+                        logger.info(f"Using move: {move.id}")
+                        return self.create_order(move)
+                logger.warning(f"Move {value} not found. Available moves: {[m.id for m in battle.available_moves]}")
+                return self.choose_random_move(battle)
+            elif action == "switch":
+                # Find the pokemon object by species
+                for pokemon in battle.available_switches:
+                    if pokemon.species.lower() == value.lower():
+                        logger.info(f"Switching to: {pokemon.species}")
+                        return self.create_order(pokemon)
+                logger.warning(f"Pokemon {value} not found. Available switches: {[p.species for p in battle.available_switches]}")
+                return self.choose_random_move(battle)
             else:
                 logger.warning(f"Invalid LLM decision: {action}, {value}. Using random move.")
                 return self.choose_random_move(battle)
