@@ -94,12 +94,14 @@ class BotManager:
         """
         try:
             # Create bot with custom configuration
+            # Filter out 'description' as it's not accepted by Player.__init__
+            filtered_config = {k: v for k, v in config.custom_config.items() if k != 'description'}
             bot = LLMPlayer(
                 battle_format=config.battle_format,
                 max_concurrent_battles=config.max_concurrent_battles,
                 use_mock_llm=config.use_mock_llm,
                 server_configuration=self.server_config,
-                **config.custom_config
+                **filtered_config
             )
             
             # Store bot reference
