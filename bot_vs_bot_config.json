@@ -1,0 +1,67 @@
+{
+  "server_url": "http://localhost:8000",
+  "websocket_url": "ws://localhost:8000/showdown/websocket",
+  "matchmaking_strategy": "elo_based",
+  "elo_threshold": 200,
+  "min_wait_time": 30.0,
+  "max_queue_size": 100,
+  "default_battle_format": "gen9randombattle",
+  "max_concurrent_battles": 3,
+  "battle_timeout": 600,
+  "auto_save_results": true,
+  "bot_configs": [
+    {
+      "username": "GeminiBot",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": true,
+      "llm_provider": "gemini",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Gemini-powered bot"
+      }
+    },
+    {
+      "username": "OpenAIBot",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": true,
+      "llm_provider": "openai",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "OpenAI-powered bot"
+      }
+    },
+    {
+      "username": "AnthropicBot",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": true,
+      "llm_provider": "anthropic",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Anthropic-powered bot"
+      }
+    },
+    {
+      "username": "OllamaBot",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": true,
+      "llm_provider": "ollama",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Ollama-powered bot"
+      }
+    }
+  ],
+  "tournament_config": {
+    "name": "Default Bot Tournament",
+    "tournament_type": "round_robin",
+    "battle_format": "gen9randombattle",
+    "max_participants": 4,
+    "rounds": 3,
+    "time_limit_per_battle": 600,
+    "concurrent_battles": 2,
+    "save_replays": true,
+    "description": "Default tournament with mock LLM bots"
+  },
+  "results_dir": "./results",
+  "config_file": "./bot_vs_bot_config.json"
+}
