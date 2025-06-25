@@ -45,4 +45,13 @@ Thumbs.db
 
 # Pokemon Showdown server
 server/
+
+# Development files
+plan.md
+scratchpad.md
+*_data.json
+demo_*.json
+results/
+
+# Claude Code settings
 .claude/settings.local.json
