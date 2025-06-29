@@ -341,6 +341,13 @@ class BotMatchmaker:
         if request2.bot_username not in self.bot_manager.active_bots:
             return False
         
+        # Check if bots have had enough time to connect (at least 2 seconds since request)
+        current_time = time.time()
+        if current_time - request1.created_time < 2.0:
+            return False
+        if current_time - request2.created_time < 2.0:
+            return False
+        
         return True
     
     def _have_played_recently(self, bot1: str, bot2: str, recent_threshold: int = 5) -> bool:

@@ -97,6 +97,7 @@ class BotManager:
             # Filter out 'description' as it's not accepted by Player.__init__
             filtered_config = {k: v for k, v in config.custom_config.items() if k != 'description'}
             bot = LLMPlayer(
+                username=config.username,
                 battle_format=config.battle_format,
                 max_concurrent_battles=config.max_concurrent_battles,
                 use_mock_llm=config.use_mock_llm,
@@ -106,6 +107,9 @@ class BotManager:
             
             # Store bot reference
             self.active_bots[config.username] = bot
+            
+            # Give the bot time to establish websocket connection
+            await asyncio.sleep(1.0)
             
             logger.info(f"Created bot: {config.username} (format: {config.battle_format})")
             return bot
@@ -143,6 +147,9 @@ class BotManager:
             if mode == BattleMode.CHALLENGE:
                 # Bot1 challenges Bot2
                 logger.info(f"Starting challenge battle: {bot1_username} vs {bot2_username}")
+                
+                # Add a small delay to ensure both bots are ready
+                await asyncio.sleep(0.5)
                 
                 # Create challenge and accept tasks
                 challenge_task = asyncio.create_task(
