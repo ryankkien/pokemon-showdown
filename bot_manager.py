@@ -14,6 +14,7 @@ import time
 
 from bot import LLMPlayer
 from poke_env.ps_client.server_configuration import ServerConfiguration
+from poke_env.ps_client.account_configuration import AccountConfiguration
 
 logger = logging.getLogger(__name__)
 
@@ -96,8 +97,12 @@ class BotManager:
             # Create bot with custom configuration
             # Filter out 'description' as it's not accepted by Player.__init__
             filtered_config = {k: v for k, v in config.custom_config.items() if k != 'description'}
+            
+            # Create account configuration for the username
+            account_config = AccountConfiguration(config.username, None)
+            
             bot = LLMPlayer(
-                username=config.username,
+                account_configuration=account_config,
                 battle_format=config.battle_format,
                 max_concurrent_battles=config.max_concurrent_battles,
                 use_mock_llm=config.use_mock_llm,
