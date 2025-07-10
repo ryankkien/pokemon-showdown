@@ -50,7 +50,7 @@ class LLMPlayer(Player):
         
     async def choose_move(self, battle: Battle) -> str:
         """
-        Choose a move using LLM decision making.
+        Choose a move using LLM decision making with error retry.
         
         Args:
             battle: The current battle state
@@ -58,45 +58,96 @@ class LLMPlayer(Player):
         Returns:
             The chosen move order
         """
-        try:
-            # Generate prompt from battle state
-            prompt = self._create_prompt(battle)
-            logger.info(f"Generated prompt for battle {battle.battle_tag}")
-            
-            # Get decision from LLM
-            llm_response = await self._get_llm_decision(prompt)
-            logger.info(f"LLM response: {llm_response}")
-            
-            # Parse LLM response
-            action, value = self._parse_llm_response(llm_response, battle)
-            
-            # Execute the chosen action
-            if action == "move":
-                # Find the move object by ID
-                for move in battle.available_moves:
-                    if move.id == value:
-                        logger.info(f"Using move: {move.id}")
-                        # Check if Terastallize is available before using it
-                        can_tera = battle.can_tera if hasattr(battle, 'can_tera') else False
-                        return self.create_order(move, terastallize=False)  # Explicitly disable terastallize for now
-                logger.warning(f"Move {value} not found. Available moves: {[m.id for m in battle.available_moves]}")
-                return self.choose_random_move(battle)
-            elif action == "switch":
-                # Find the pokemon object by species
-                for pokemon in battle.available_switches:
-                    if pokemon.species.lower() == value.lower():
-                        logger.info(f"Switching to: {pokemon.species}")
-                        return self.create_order(pokemon)
-                logger.warning(f"Pokemon {value} not found. Available switches: {[p.species for p in battle.available_switches]}")
-                return self.choose_random_move(battle)
-            else:
-                logger.warning(f"Invalid LLM decision: {action}, {value}. Using random move.")
-                return self.choose_random_move(battle)
+        max_retries = 2
+        
+        for attempt in range(max_retries + 1):
+            try:
+                # Generate prompt from battle state
+                prompt = self._create_prompt(battle)
+                if attempt > 0:
+                    # Add error context to the prompt for retries
+                    prompt += f"\n\nIMPORTANT: Previous attempt failed. Make sure to choose ONLY from the available moves and switches listed above. Do not use moves that are not in the 'Available Actions' section."
                 
-        except Exception as e:
-            logger.error(f"Error in choose_move: {e}")
-            # Fallback to random move
-            return self.choose_random_move(battle)
+                logger.info(f"Generated prompt for battle {battle.battle_tag} (attempt {attempt + 1})")
+                
+                # Get decision from LLM
+                llm_response = await self._get_llm_decision(prompt)
+                logger.info(f"LLM response (attempt {attempt + 1}): {llm_response}")
+                
+                # Parse LLM response
+                action, value = self._parse_llm_response(llm_response, battle)
+                
+                # Validate and execute the chosen action
+                result = self._execute_validated_action(action, value, battle)
+                if result:
+                    return result
+                
+                # If we get here, the action was invalid, try again
+                if attempt < max_retries:
+                    logger.warning(f"Invalid action on attempt {attempt + 1}, retrying...")
+                    continue
+                else:
+                    logger.warning(f"All {max_retries + 1} attempts failed, using safe random move")
+                    return self._choose_safe_random_move(battle)
+                    
+            except Exception as e:
+                logger.error(f"Error in choose_move attempt {attempt + 1}: {e}")
+                if attempt < max_retries:
+                    continue
+                else:
+                    # Final fallback
+                    return self._choose_safe_random_move(battle)
+    
+    def _execute_validated_action(self, action: str, value: str, battle: Battle) -> Optional[str]:
+        """
+        Execute an action after validation.
+        
+        Returns:
+            The battle order if valid, None if invalid
+        """
+        if action == "move":
+            # Strict validation: only allow moves that are actually available
+            for move in battle.available_moves:
+                if move.id.lower() == value.lower():
+                    logger.info(f"Using validated move: {move.id}")
+                    return self.create_order(move, terastallize=False)
+            logger.warning(f"Move '{value}' not in available moves: {[m.id for m in battle.available_moves]}")
+            return None
+            
+        elif action == "switch":
+            # Strict validation: only allow switches that are actually available
+            for pokemon in battle.available_switches:
+                if pokemon.species.lower() == value.lower():
+                    logger.info(f"Using validated switch: {pokemon.species}")
+                    return self.create_order(pokemon)
+            logger.warning(f"Pokemon '{value}' not in available switches: {[p.species for p in battle.available_switches]}")
+            return None
+        else:
+            logger.warning(f"Invalid action type: {action}")
+            return None
+    
+    def _choose_safe_random_move(self, battle: Battle) -> str:
+        """
+        Choose a random move without using special mechanics like Terastallize, Mega, Dynamax, etc.
+        This prevents invalid choice errors.
+        """
+        import random
+        
+        # Try to use a regular move first
+        if battle.available_moves:
+            move = random.choice(battle.available_moves)
+            logger.info(f"Choosing safe random move: {move.id}")
+            return self.create_order(move, terastallize=False, mega=False, dynamax=False, z_move=False)
+        
+        # If no moves available, try to switch
+        if battle.available_switches:
+            pokemon = random.choice(battle.available_switches)
+            logger.info(f"Choosing safe random switch: {pokemon.species}")
+            return self.create_order(pokemon)
+        
+        # Last resort - struggle
+        logger.warning("No safe moves or switches available, defaulting to struggle")
+        return self.choose_default_move()
     
     def _create_prompt(self, battle: Battle) -> str:
         """

@@ -303,7 +303,7 @@ class StateProcessor:
         info += ")"
         
         # Add effect description if available
-        if move.effect:
+        if hasattr(move, 'effect') and move.effect:
             info += f" - {move.effect}"
             
         # Add strategic notes for common moves
