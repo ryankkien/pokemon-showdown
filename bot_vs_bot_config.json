@@ -11,115 +11,46 @@
   "auto_save_results": true,
   "bot_configs": [
     {
-      "username": "Claude3Opus",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
-      "llm_provider": "anthropic",
-      "model": "claude-3-opus-20240229",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "Claude 3 Opus - Most capable Anthropic model"
-      }
-    },
-    {
-      "username": "Claude3Sonnet",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
-      "llm_provider": "anthropic",
-      "model": "claude-3-sonnet-20240229",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "Claude 3 Sonnet - Balanced Anthropic model"
-      }
-    },
-    {
-      "username": "Claude3Haiku",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
-      "llm_provider": "anthropic",
-      "model": "claude-3-haiku-20240307",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "Claude 3 Haiku - Fast Anthropic model"
-      }
-    },
-    {
-      "username": "GPT4Turbo",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
-      "llm_provider": "openai",
-      "model": "gpt-4-turbo-preview",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "GPT-4 Turbo - Latest OpenAI model"
-      }
-    },
-    {
-      "username": "GPT4",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
-      "llm_provider": "openai",
-      "model": "gpt-4",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "GPT-4 - Standard OpenAI model"
-      }
-    },
-    {
-      "username": "GPT35Turbo",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
-      "llm_provider": "openai",
-      "model": "gpt-3.5-turbo",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "GPT-3.5 Turbo - Fast OpenAI model"
-      }
-    },
-    {
-      "username": "GeminiPro",
+      "username": "Gemini-1.5-Flash",
       "battle_format": "gen9randombattle",
       "use_mock_llm": false,
       "llm_provider": "gemini",
-      "model": "gemini-pro",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Gemini Pro - Google's advanced model"
+        "description": "Google Gemini 1.5 Flash model"
       }
     },
     {
-      "username": "Gemini15Pro",
+      "username": "GPT-4-Turbo",
       "battle_format": "gen9randombattle",
       "use_mock_llm": false,
-      "llm_provider": "gemini",
-      "model": "gemini-1.5-pro",
+      "llm_provider": "openai",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Gemini 1.5 Pro - Google's latest model"
+        "description": "OpenAI GPT-4 Turbo model"
       }
     },
     {
-      "username": "Gemini15Flash",
+      "username": "Claude-3-Opus",
       "battle_format": "gen9randombattle",
       "use_mock_llm": false,
-      "llm_provider": "gemini",
-      "model": "gemini-1.5-flash",
+      "llm_provider": "anthropic",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Gemini 1.5 Flash - Fast Google model"
+        "description": "Anthropic Claude 3 Opus model"
       }
     }
   ],
   "tournament_config": {
-    "name": "AI Model Battle Tournament",
+    "name": "Default Bot Tournament",
     "tournament_type": "round_robin",
     "battle_format": "gen9randombattle",
-    "max_participants": 9,
+    "max_participants": 4,
     "rounds": 3,
     "time_limit_per_battle": 600,
-    "concurrent_battles": 3,
+    "concurrent_battles": 2,
     "save_replays": true,
-    "description": "Tournament featuring multiple AI models from Anthropic, OpenAI, and Google"
+    "description": "Default tournament with mock LLM bots"
   },
   "results_dir": "./results",
   "config_file": "./bot_vs_bot_config.json"
