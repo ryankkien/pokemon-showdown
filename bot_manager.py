@@ -145,6 +145,17 @@ class BotManager:
         bot1 = self.active_bots[bot1_username]
         bot2 = self.active_bots[bot2_username]
         
+        # Store initial battle statistics for winner determination
+        bot1._initial_wins = bot1.n_won_battles
+        bot1._initial_losses = bot1.n_lost_battles
+        bot1._initial_ties = bot1.n_tied_battles
+        bot2._initial_wins = bot2.n_won_battles
+        bot2._initial_losses = bot2.n_lost_battles
+        bot2._initial_ties = bot2.n_tied_battles
+        
+        logger.info(f"Initial stats - {bot1_username}: {bot1.n_won_battles}W/{bot1.n_lost_battles}L/{bot1.n_tied_battles}T")
+        logger.info(f"Initial stats - {bot2_username}: {bot2.n_won_battles}W/{bot2.n_lost_battles}L/{bot2.n_tied_battles}T")
+        
         battle_id = str(uuid.uuid4())[:8]
         start_time = time.time()
         
@@ -182,7 +193,11 @@ class BotManager:
             # Calculate battle duration
             duration = time.time() - start_time
             
-            # Determine winner (simplified - would need actual battle result tracking)
+            # Log final battle statistics
+            logger.info(f"Final stats - {bot1_username}: {bot1.n_won_battles}W/{bot1.n_lost_battles}L/{bot1.n_tied_battles}T")
+            logger.info(f"Final stats - {bot2_username}: {bot2.n_won_battles}W/{bot2.n_lost_battles}L/{bot2.n_tied_battles}T")
+            
+            # Determine winner based on battle statistics
             winner = self._determine_winner(bot1, bot2)
             
             # Store battle result
@@ -206,21 +221,44 @@ class BotManager:
 
     def _determine_winner(self, bot1: LLMPlayer, bot2: LLMPlayer) -> Optional[str]:
         """
-        Determine battle winner from bot states.
-        This is a simplified implementation - real implementation would 
-        need to track battle outcomes properly.
+        Determine battle winner from bot battle statistics.
         
         Args:
             bot1: First bot
             bot2: Second bot
             
         Returns:
-            Winner username or None for draw
+            Winner username or None for draw/unknown
         """
-        # This is a placeholder - actual implementation would need
-        # to monitor battle events and track wins/losses
-        # For now, return None (draw) as we can't easily determine winner
-        return None
+        try:
+            # Get the initial battle counts before the battle
+            bot1_initial_wins = getattr(bot1, '_initial_wins', bot1.n_won_battles)
+            bot1_initial_losses = getattr(bot1, '_initial_losses', bot1.n_lost_battles)
+            bot2_initial_wins = getattr(bot2, '_initial_wins', bot2.n_won_battles)
+            bot2_initial_losses = getattr(bot2, '_initial_losses', bot2.n_lost_battles)
+            
+            # Calculate wins gained during this battle
+            bot1_wins_gained = bot1.n_won_battles - bot1_initial_wins
+            bot1_losses_gained = bot1.n_lost_battles - bot1_initial_losses
+            bot2_wins_gained = bot2.n_won_battles - bot2_initial_wins
+            bot2_losses_gained = bot2.n_lost_battles - bot2_initial_losses
+            
+            logger.info(f"Battle stats - {bot1.username}: +{bot1_wins_gained}W/+{bot1_losses_gained}L, {bot2.username}: +{bot2_wins_gained}W/+{bot2_losses_gained}L")
+            
+            # Determine winner based on who gained a win
+            if bot1_wins_gained > 0 and bot2_losses_gained > 0:
+                return bot1.username
+            elif bot2_wins_gained > 0 and bot1_losses_gained > 0:
+                return bot2.username
+            elif bot1.n_tied_battles > getattr(bot1, '_initial_ties', 0) or bot2.n_tied_battles > getattr(bot2, '_initial_ties', 0):
+                return None  # Tie
+            else:
+                logger.warning("Could not determine battle winner from statistics")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error determining winner: {e}")
+            return None
 
     async def run_tournament(self, bot_configs: List[BotConfig], 
                            battle_format: str = "gen9randombattle") -> List[BattleResult]:
