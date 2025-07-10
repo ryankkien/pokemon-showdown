@@ -6,7 +6,7 @@
   "min_wait_time": 30.0,
   "max_queue_size": 100,
   "default_battle_format": "gen9randombattle",
-  "max_concurrent_battles": 3,
+  "max_concurrent_battles": 6,
   "battle_timeout": 600,
   "auto_save_results": true,
   "bot_configs": [
@@ -17,7 +17,63 @@
       "llm_provider": "gemini",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Google Gemini 1.5 Flash model"
+        "description": "Google Gemini 1.5 Flash model",
+        "model": "gemini-1.5-flash"
+      }
+    },
+    {
+      "username": "Gemini-1.5-Pro",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "gemini",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Google Gemini 1.5 Pro model",
+        "model": "gemini-1.5-pro"
+      }
+    },
+    {
+      "username": "Gemini-1.5-Pro-002",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "gemini",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Google Gemini 1.5 Pro-002 model",
+        "model": "gemini-1.5-pro-002"
+      }
+    },
+    {
+      "username": "Gemini-2.0-Flash",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "gemini",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Google Gemini 2.0 Flash model",
+        "model": "gemini-2.0-flash-exp"
+      }
+    },
+    {
+      "username": "GPT-4o",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "openai",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "OpenAI GPT-4o model",
+        "model": "gpt-4o"
+      }
+    },
+    {
+      "username": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "openai",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "OpenAI GPT-4o-mini model",
+        "model": "gpt-4o-mini"
       }
     },
     {
@@ -27,7 +83,41 @@
       "llm_provider": "openai",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "OpenAI GPT-4 Turbo model"
+        "description": "OpenAI GPT-4 Turbo model",
+        "model": "gpt-4-turbo"
+      }
+    },
+    {
+      "username": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "openai",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "OpenAI GPT-3.5 Turbo model",
+        "model": "gpt-3.5-turbo"
+      }
+    },
+    {
+      "username": "Claude-3.5-Sonnet",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "anthropic",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Anthropic Claude 3.5 Sonnet model",
+        "model": "claude-3-5-sonnet-20241022"
+      }
+    },
+    {
+      "username": "Claude-3.5-Haiku",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "anthropic",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Anthropic Claude 3.5 Haiku model",
+        "model": "claude-3-5-haiku-20241022"
       }
     },
     {
@@ -37,7 +127,19 @@
       "llm_provider": "anthropic",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Anthropic Claude 3 Opus model"
+        "description": "Anthropic Claude 3 Opus model",
+        "model": "claude-3-opus-20240229"
+      }
+    },
+    {
+      "username": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "anthropic",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Anthropic Claude 3 Sonnet model",
+        "model": "claude-3-sonnet-20240229"
       }
     }
   ],
@@ -45,7 +147,7 @@
     "name": "Default Bot Tournament",
     "tournament_type": "round_robin",
     "battle_format": "gen9randombattle",
-    "max_participants": 4,
+    "max_participants": 12,
     "rounds": 3,
     "time_limit_per_battle": 600,
     "concurrent_battles": 2,

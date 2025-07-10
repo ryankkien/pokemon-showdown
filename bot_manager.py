@@ -96,17 +96,24 @@ class BotManager:
         """
         try:
             # Create bot with custom configuration
-            # Filter out 'description' as it's not accepted by Player.__init__
-            filtered_config = {k: v for k, v in config.custom_config.items() if k != 'description'}
+            # Filter out parameters that are not accepted by Player.__init__
+            # 'description' and 'model' are not accepted by Player.__init__
+            filtered_config = {k: v for k, v in config.custom_config.items() 
+                             if k not in ['description', 'model']}
             
             # Create account configuration for the username
             account_config = AccountConfiguration(config.username, None)
+            
+            # Extract model from custom_config if it exists
+            model = config.custom_config.get('model') if config.custom_config else None
             
             bot = LLMPlayer(
                 account_configuration=account_config,
                 battle_format=config.battle_format,
                 max_concurrent_battles=config.max_concurrent_battles,
                 use_mock_llm=config.use_mock_llm,
+                llm_provider=config.llm_provider,
+                model=model,
                 server_configuration=self.server_config,
                 **filtered_config
             )

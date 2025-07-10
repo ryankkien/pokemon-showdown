@@ -132,13 +132,20 @@ async def run_tournament(config_manager: BotVsBotConfigManager):
         await bot_manager.shutdown()
 
 
-async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager):
+async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None):
     """Run continuous matchmaking system."""
     global running, manager, matchmaker
     
     print("Starting continuous matchmaking system...")
     print(f"Bots: {[bot.username for bot in config_manager.config.bot_configs]}")
     print(f"Strategy: {config_manager.config.matchmaking_strategy.value}")
+    if duration_minutes:
+        print(f"Duration: {duration_minutes} minutes")
+    
+    # Calculate end time if duration specified
+    import time
+    start_time = time.time()
+    end_time = start_time + (duration_minutes * 60) if duration_minutes else None
     
     # Create components
     manager = BotManager(config_manager.config.server_url)
@@ -174,6 +181,12 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager):
         last_stats_print = 0
         
         while running:
+            # Check if duration has elapsed
+            if end_time and time.time() >= end_time:
+                print(f"\nDuration of {duration_minutes} minutes elapsed. Shutting down...")
+                running = False
+                break
+                
             await asyncio.sleep(30)  # Check every 30 seconds
             
             # Print stats periodically
@@ -264,6 +277,12 @@ async def main():
                        help="Start web leaderboard server alongside battles")
     parser.add_argument("--leaderboard-port", type=int, default=5000,
                        help="Port for leaderboard server")
+    parser.add_argument("--duration", type=int, default=None,
+                       help="Duration to run continuous battles (in minutes)")
+    parser.add_argument("--models", nargs='+', default=None,
+                       help="Filter models to use (e.g., --models gemini openai anthropic)")
+    parser.add_argument("--exclude-models", nargs='+', default=None,
+                       help="Exclude specific models (e.g., --exclude-models gpt-3.5-turbo)")
     
     args = parser.parse_args()
     
@@ -296,6 +315,48 @@ async def main():
     else:
         print(f"Loading configuration from: {args.config}")
         config_manager = BotVsBotConfigManager(args.config)
+    
+    # Filter models based on command line arguments
+    if args.models or args.exclude_models:
+        original_count = len(config_manager.config.bot_configs)
+        filtered_configs = []
+        
+        for bot_config in config_manager.config.bot_configs:
+            # Include filtering
+            if args.models:
+                include = False
+                for model_filter in args.models:
+                    if (model_filter.lower() in bot_config.llm_provider.lower() or
+                        model_filter.lower() in bot_config.username.lower()):
+                        include = True
+                        break
+                if not include:
+                    continue
+            
+            # Exclude filtering
+            if args.exclude_models:
+                exclude = False
+                for exclude_filter in args.exclude_models:
+                    if (exclude_filter.lower() in bot_config.username.lower() or
+                        exclude_filter.lower() in bot_config.llm_provider.lower()):
+                        exclude = True
+                        break
+                if exclude:
+                    continue
+            
+            filtered_configs.append(bot_config)
+        
+        config_manager.config.bot_configs = filtered_configs
+        print(f"Filtered bots: {original_count} -> {len(filtered_configs)} models")
+        
+        if len(filtered_configs) == 0:
+            print("Error: No bots remain after filtering")
+            return
+        elif len(filtered_configs) == 1:
+            print("Warning: Only one bot remains after filtering")
+            if args.mode == "single":
+                print("Cannot run single battle with only one bot")
+                return
     
     # Validate configuration
     issues = config_manager.validate_config()
@@ -339,7 +400,7 @@ async def main():
         elif args.mode == "tournament":
             await run_tournament(config_manager)
         elif args.mode == "continuous":
-            await run_continuous_matchmaking(config_manager)
+            await run_continuous_matchmaking(config_manager, args.duration)
     
     except KeyboardInterrupt:
         print("\nShutdown requested by user")

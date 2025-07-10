@@ -34,18 +34,21 @@ class LLMPlayer(Player):
     A Pokemon Showdown player that uses an LLM for decision making.
     """
     
-    def __init__(self, battle_format: str = "gen9randombattle", use_mock_llm: bool = False, **kwargs):
+    def __init__(self, battle_format: str = "gen9randombattle", use_mock_llm: bool = False, 
+                 llm_provider: Optional[str] = None, model: Optional[str] = None, **kwargs):
         """
         Initialize the LLM player.
         
         Args:
             battle_format: The Pokemon Showdown battle format
             use_mock_llm: Whether to use mock LLM for testing
+            llm_provider: LLM provider to use (gemini, openai, anthropic, etc.)
+            model: Specific model to use (e.g., 'gpt-4o', 'claude-3-5-sonnet-20241022')
             **kwargs: Additional arguments for the Player class
         """
         super().__init__(battle_format=battle_format, **kwargs)
         self.state_processor = StateProcessor()
-        self.llm_client = create_llm_client(use_mock=use_mock_llm)
+        self.llm_client = create_llm_client(use_mock=use_mock_llm, provider=llm_provider, model=model)
         self.response_parser = ResponseParser()
         self.battle_tracker = battle_tracker  # Reference to global tracker
         

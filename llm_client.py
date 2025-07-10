@@ -47,16 +47,18 @@ class LLMClient:
     Supports Google Gemini and OpenAI-compatible APIs.
     """
     
-    def __init__(self, provider: str = "gemini"):
+    def __init__(self, provider: str = "gemini", model: Optional[str] = None):
         """
         Initialize the LLM client.
         
         Args:
             provider: The LLM provider to use ("gemini", "openai", "anthropic", "ollama", etc.)
+            model: Specific model to use (overrides environment variable)
         """
         self.provider = provider
         self.client = None
         self.model = None
+        self.requested_model = model  # Store requested model for later use
         
         if provider == "gemini":
             self._initialize_gemini()
@@ -77,10 +79,11 @@ class LLMClient:
         try:
             genai.configure(api_key=api_key)
             
-            # Use Gemini Pro model - good balance of speed and capability
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            # Use requested model or default to Gemini Flash
+            model_name = self.requested_model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+            self.model = genai.GenerativeModel(model_name)
             
-            logger.info("Gemini client initialized successfully")
+            logger.info(f"Gemini client initialized successfully with model: {model_name}")
             
         except Exception as e:
             logger.error(f"Failed to initialize Gemini client: {e}")
@@ -95,21 +98,21 @@ class LLMClient:
         if provider == "openai":
             api_key = os.getenv("OPENAI_API_KEY")
             base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-            model_name = os.getenv("OPENAI_MODEL", "gpt-4-turbo-preview")
+            model_name = self.requested_model or os.getenv("OPENAI_MODEL", "gpt-4-turbo-preview")
         elif provider == "anthropic":
             api_key = os.getenv("ANTHROPIC_API_KEY")
             # Anthropic uses a different API structure, not OpenAI-compatible
             # For now, we'll use the messages endpoint
             base_url = os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
-            model_name = os.getenv("ANTHROPIC_MODEL", "claude-3-opus-20240229")
+            model_name = self.requested_model or os.getenv("ANTHROPIC_MODEL", "claude-3-opus-20240229")
         elif provider == "ollama":
             api_key = "ollama"  # Ollama doesn't need API key
             base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-            model_name = os.getenv("OLLAMA_MODEL", "llama2")
+            model_name = self.requested_model or os.getenv("OLLAMA_MODEL", "llama2")
         else:  # custom
             api_key = os.getenv("LLM_API_KEY")
             base_url = os.getenv("LLM_BASE_URL")
-            model_name = os.getenv("LLM_MODEL")
+            model_name = self.requested_model or os.getenv("LLM_MODEL")
         
         if not api_key and provider != "ollama":
             raise ValueError(f"{provider.upper()}_API_KEY not found in environment variables")
@@ -290,13 +293,14 @@ reasoning: Using available move for battle strategy"""
         return True
 
 
-def create_llm_client(use_mock: bool = False, provider: Optional[str] = None) -> LLMClient:
+def create_llm_client(use_mock: bool = False, provider: Optional[str] = None, model: Optional[str] = None) -> LLMClient:
     """
     Factory function to create an LLM client.
     
     Args:
         use_mock: If True, returns a mock client for testing
         provider: LLM provider to use (gemini, openai, anthropic, ollama, custom)
+        model: Specific model to use (e.g., 'gpt-4o', 'claude-3-5-sonnet-20241022')
         
     Returns:
         LLMClient instance
@@ -310,7 +314,7 @@ def create_llm_client(use_mock: bool = False, provider: Optional[str] = None) ->
     
     # Try to create real client, fall back to mock if configuration is missing
     try:
-        return LLMClient(provider)
+        return LLMClient(provider, model)
     except (ValueError, ImportError) as e:
         logger.warning(f"Failed to create {provider} LLM client ({e}), using mock client")
         return MockLLMClient()
