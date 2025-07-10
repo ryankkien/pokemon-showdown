@@ -15,6 +15,7 @@ import time
 from bot import LLMPlayer
 from poke_env.ps_client.server_configuration import ServerConfiguration
 from poke_env.ps_client.account_configuration import AccountConfiguration
+from battle_tracker import battle_tracker
 
 logger = logging.getLogger(__name__)
 
@@ -159,6 +160,9 @@ class BotManager:
         battle_id = str(uuid.uuid4())[:8]
         start_time = time.time()
         
+        # Start battle tracking
+        battle_tracker.start_battle(battle_id, bot1_username, bot2_username, battle_format)
+        
         try:
             if mode == BattleMode.CHALLENGE:
                 # Bot1 challenges Bot2
@@ -213,6 +217,10 @@ class BotManager:
             self.battle_results.append(result)
             
             logger.info(f"Battle completed: {battle_id}, Winner: {winner}")
+            
+            # End battle tracking
+            battle_tracker.end_battle(battle_id, winner, duration)
+            
             return battle_id
             
         except Exception as e:
