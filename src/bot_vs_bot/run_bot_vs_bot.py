@@ -152,14 +152,17 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
     matchmaker = BotMatchmaker(manager, config_manager.config.matchmaking_strategy)
     leaderboard = LeaderboardManager()
     
-    # Load existing stats into matchmaker
+    # Load existing stats into matchmaker (only if they have actual battles)
     print("Loading existing leaderboard data...")
+    loaded_count = 0
     for username, stats in leaderboard.bot_stats.items():
-        matchmaker.bot_stats[username] = stats
-    if leaderboard.bot_stats:
-        print(f"  Loaded stats for {len(leaderboard.bot_stats)} bots")
+        if stats.total_battles > 0:  # Only load stats with actual battles
+            matchmaker.bot_stats[username] = stats
+            loaded_count += 1
+    if loaded_count > 0:
+        print(f"  Loaded stats for {loaded_count} bots with battle history")
     else:
-        print("  No existing stats found - starting fresh")
+        print("  No existing battle stats found - starting fresh")
     
     try:
         # Create all bots
@@ -188,6 +191,7 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
         # Monitor and add periodic match requests
         battle_count = 0
         last_stats_print = 0
+        processed_battles = set()  # Track which battles we've already processed
         
         while running:
             # Check if duration has elapsed
@@ -196,7 +200,15 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
                 running = False
                 break
                 
-            await asyncio.sleep(30)  # Check every 30 seconds
+            await asyncio.sleep(5)  # Check every 5 seconds for better responsiveness
+            
+            # Check for newly completed battles and update matchmaker
+            for battle_result in manager.battle_results:
+                if battle_result.battle_id not in processed_battles:
+                    # This is a newly completed battle
+                    matchmaker.update_battle_result(battle_result)
+                    processed_battles.add(battle_result.battle_id)
+                    print(f"Battle completed: {battle_result.bot1_username} vs {battle_result.bot2_username} - Winner: {battle_result.winner}")
             
             # Print stats periodically
             current_time = asyncio.get_event_loop().time()
