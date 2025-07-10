@@ -54,9 +54,190 @@ demo_*.json
 results/
 battle_analysis/
 
+# Demo and test files
+demo_*
+test_data/
+temp_*
+tmp_*
+*.tmp
+*.temp
+sample_*
+example_*
+*_example.*
+*_sample.*
+*_test.*
+
 # Server and battle logs
 server.log
 *.log
 
+# Potentially sensitive files
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.csr
+*.p7b
+*.p7c
+*.p7r
+*.spc
+*.jks
+*.keystore
+*.truststore
+
+# API keys and secrets
+*api_key*
+*secret*
+*token*
+*.credentials
+.env.*
+!.env.example
+
+# Personal notes and scratch files
+notes.md
+NOTES.md
+TODO.md
+todo.md
+scratch.*
+debug.*
+temp.*
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+
+# Generated documentation
+*.html
+*.pdf
+!docs/*.html
+!docs/*.pdf
+
+# Cache directories
+.cache/
+.pytest_cache/
+.coverage
+.nyc_output/
+
+# Large files that shouldn't be committed
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.iso
+*.dmg
+*.exe
+*.msi
+*.deb
+*.rpm
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db3
+
+# OS generated thumbnails
+.thumbnails/
+.fseventsd/
+.DocumentRevisions-V100/
+.TemporaryItems/
+.Trashes/
+.VolumeIcon.icns
+.AppleDouble/
+.LSOverride
+desktop.ini
+ehthumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Node.js (in case we add any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python additional patterns
+.python-version
+.coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# MacOS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows specific
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
 # Claude Code settings
-.claude/settings.local.json
+.claude/
+*.claude.md
+*claude*.md
+CLAUDE.md
+claude.md
+.claude-*
+CLAUDE-*
+claude-*
