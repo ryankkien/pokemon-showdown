@@ -1,5 +1,37 @@
 {
+  "name": "llm-pokemon-showdown-bot",
+  "version": "1.0.0",
+  "description": "An AI-powered Pokemon Showdown bot system using Large Language Models",
+  "main": "bot.py",
+  "scripts": {
+    "start": "python run_bot.py",
+    "bot-vs-bot": "python run_bot_vs_bot.py",
+    "test": "python test_bot.py && python test_bot_vs_bot.py",
+    "setup": "pip install -r requirements.txt",
+    "leaderboard": "python leaderboard_server.py",
+    "server": "./start_server.sh"
+  },
+  "keywords": [
+    "pokemon",
+    "showdown",
+    "bot",
+    "llm",
+    "ai",
+    "gemini",
+    "openai",
+    "claude",
+    "battles"
+  ],
+  "author": "LLM Pokemon Bot Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "pokemon-showdown-bot"
+  },
   "dependencies": {
     "claude": "^0.1.1"
+  },
+  "engines": {
+    "python": ">=3.8"
   }
 }

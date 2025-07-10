@@ -1,19 +1,10 @@
 # LLM Pokemon Showdown Bot
 
-An AI-powered Pokemon Showdown bot that uses Large Language Models to make strategic decisions in Pokemon battles.
+An AI-powered Pokemon Showdown bot system that uses Large Language Models to make strategic decisions in Pokemon battles.
 
-## Architecture
+## 🚀 Quick Start
 
-The bot consists of four main components:
-1. **State Processor**: Converts battle state into detailed prompts for the LLM
-2. **LLM Client**: Communicates with various LLM APIs (OpenAI, Anthropic, Google Gemini, Ollama, etc.)
-3. **Response Parser**: Parses LLM responses into valid game actions
-4. **LLMPlayer**: Main bot class that coordinates everything
-
-## Quick Start (All-in-One)
-
-The easiest way to get started:
-
+### All-in-One Setup
 ```bash
 ./run_all.sh
 ```
@@ -25,270 +16,177 @@ This single command will:
 - Run the bot
 - Clean up when you're done
 
-## Manual Setup
-
-### 1. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment Variables
-
-Copy the example environment file:
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
-- `LLM_PROVIDER`: Choose your LLM provider (gemini, openai, anthropic, ollama, custom)
-- `USE_MOCK_LLM`: Set to "false" to use real LLM, "true" for testing
-- `PS_SERVER_URL`: Pokemon Showdown server URL (default: http://localhost:8000)
-- `PS_USERNAME`: Your bot's username
-- `PS_BATTLE_FORMAT`: Battle format to play (default: gen9randombattle)
-
-### 3. Run with Integrated Server Management
-
+### Single Bot Battle
 ```bash
 python run_bot.py
 ```
 
-This will automatically:
-- Set up a local Pokemon Showdown server if needed
-- Start the server
-- Run the bot
-- Stop the server when done
-
-### Alternative: Run Components Separately
-
-If you prefer to manage the server yourself:
-
+### Bot vs Bot Battles
 ```bash
-# Terminal 1: Start server
-./start_server.sh
+# Setup configuration
+python run_bot_vs_bot.py --setup
 
-# Terminal 2: Run bot
-python bot.py
+# Run quick battle
+python run_bot_vs_bot.py --quick --mode single
+
+# Run tournament
+python run_bot_vs_bot.py --mode tournament
+
+# Run continuous matchmaking with leaderboard
+python run_bot_vs_bot.py --mode continuous --leaderboard
 ```
 
-### With Real LLM
+## 📁 Project Structure
 
-Choose your preferred LLM provider and configure accordingly:
+### Core Components
+- **`bot.py`** - Main bot implementation with LLMPlayer class
+- **`state_processor.py`** - Converts battle state to LLM prompts
+- **`llm_client.py`** - Handles LLM API communication
+- **`response_parser.py`** - Parses LLM responses into actions
 
-#### OpenAI (GPT-4, GPT-3.5)
+### Bot vs Bot System
+- **`bot_manager.py`** - Manages multiple bot instances
+- **`bot_matchmaker.py`** - Advanced matchmaking with ELO ratings
+- **`bot_vs_bot_config.py`** - Configuration management
+- **`run_bot_vs_bot.py`** - Main bot vs bot script
+- **`leaderboard_server.py`** - Web-based leaderboard
+
+### Configuration & Testing
+- **`test_bot.py`** - Single bot testing
+- **`test_bot_vs_bot.py`** - Bot vs bot testing
+- **`requirements.txt`** - Python dependencies
+
+## 🎮 Battle Modes
+
+### Single Bot
+Play against Pokemon Showdown's ladder or other players.
+
+### Bot vs Bot
+- **Single Battle** - One-off matches
+- **Tournament** - Round robin, Swiss system, elimination
+- **Continuous Matchmaking** - ELO-based ladder system
+
+## 🧠 Supported LLM Providers
+
+- **Google Gemini** - `gemini`
+- **OpenAI ChatGPT** - `openai`
+- **Anthropic Claude** - `anthropic`
+- **Ollama (Local)** - `ollama`
+- **Custom OpenAI-compatible** - `custom`
+- **Mock LLM** - `mock` (for testing)
+
+## ⚙️ Configuration
+
+### Environment Variables
+Copy `.env.example` to `.env` and configure:
+
 ```bash
-LLM_PROVIDER=openai
-USE_MOCK_LLM=false
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_MODEL=gpt-4-turbo-preview  # or gpt-3.5-turbo
-```
-
-#### Anthropic (Claude)
-```bash
-LLM_PROVIDER=anthropic  
-USE_MOCK_LLM=false
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-ANTHROPIC_MODEL=claude-3-opus-20240229  # or claude-3-sonnet-20240229
-```
-
-#### Google Gemini
-```bash
+# LLM Configuration
 LLM_PROVIDER=gemini
 USE_MOCK_LLM=false
-GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY=your_api_key_here
+
+# Pokemon Showdown Configuration
+PS_SERVER_URL=http://localhost:8000
+PS_USERNAME=YourBotName
+PS_BATTLE_FORMAT=gen9randombattle
 ```
 
-#### Ollama (Local Models)
-First, install and run Ollama:
+### Bot vs Bot Configuration
 ```bash
-# Install Ollama (macOS/Linux)
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Pull a model
-ollama pull llama2
-
-# Configure bot
-LLM_PROVIDER=ollama
-USE_MOCK_LLM=false
-OLLAMA_MODEL=llama2  # or any model you've pulled
+# Generate configuration file
+python run_bot_vs_bot.py --setup
 ```
 
-#### Custom OpenAI-Compatible API
-For any service that provides an OpenAI-compatible API:
-```bash
-LLM_PROVIDER=custom
-USE_MOCK_LLM=false
-LLM_API_KEY=your_api_key
-LLM_MODEL=your_model_name
-LLM_BASE_URL=https://your-api-endpoint.com/v1
-```
+## 📊 Features
 
-After configuring your provider, run:
-```bash
-python bot.py
-```
+### Real-Time Web Leaderboard
+- Live ELO rankings
+- Battle statistics
+- Win/loss records
+- Recent form tracking
+- Mobile responsive
 
-### Testing Components
+### Analytics
+- Battle duration analysis
+- Move effectiveness tracking
+- Format performance metrics
+- Tournament brackets
+- Export to JSON/CSV
 
-Test individual components without connecting to a server:
+### Battle Formats
+- Random battles (Gen 1-9)
+- Competitive tiers (OU, UU, Ubers)
+- Doubles battles
+- Custom formats
+
+## 🛠️ Development
+
+### Testing
 ```bash
+# Test single bot
 python test_bot.py
+
+# Test bot vs bot system
+python test_bot_vs_bot.py
 ```
-
-## Playing Different Formats
-
-### Quick Format Selection
-
-Use the convenient format selector script:
-
-```bash
-# Play current generation (Gen 9)
-python play_format.py gen9
-
-# Play classic Red/Blue/Yellow battles  
-python play_format.py gen1
-
-# Play Sword/Shield doubles
-python play_format.py gen8doubles
-
-# Play 10 battles in Diamond/Pearl generation
-python play_format.py gen4 10
-```
-
-### Available Formats
-
-- `gen9` - Current generation (Scarlet/Violet)
-- `gen8` - Sword/Shield generation
-- `gen7` - Ultra Sun/Ultra Moon generation  
-- `gen6` - Omega Ruby/Alpha Sapphire generation
-- `gen5` - Black 2/White 2 generation
-- `gen4` - Diamond/Pearl/Platinum generation
-- `gen3` - Ruby/Sapphire/Emerald generation
-- `gen2` - Gold/Silver/Crystal generation
-- `gen1` - Red/Blue/Yellow generation
-- `gen9doubles` - Current generation doubles
-- `gen8doubles` - Sword/Shield doubles
-
-### Manual Configuration
-
-You can also directly edit the `.env` file:
-
-```bash
-PS_BATTLE_FORMAT=gen1randombattle
-```
-
-## How It Works
-
-### 1. State Processing
-The bot analyzes the current battle state and creates a detailed prompt including:
-- Your active Pokemon's stats, moves, HP, and status
-- Opponent's known information
-- Available moves and switches
-- Field conditions (weather, terrain, hazards)
-- Strategic considerations
-
-### 2. LLM Decision Making
-The prompt is sent to the LLM which analyzes the situation and suggests the best action in a structured format:
-
-```
-action: move
-value: flamethrower
-reasoning: Super effective against opponent's Grass-type Pokemon
-```
-
-### 3. Response Parsing
-The bot parses the LLM response using:
-- Structured parsing for the expected format
-- Fuzzy parsing for natural language responses
-- Validation against available actions
-- Fallback to safe moves if parsing fails
-
-### 4. Action Execution
-The validated action is converted to a poke-env command and sent to the Pokemon Showdown server.
-
-## File Structure
-
-- `bot.py` - Main bot implementation with LLMPlayer class
-- `state_processor.py` - Converts battle state to LLM prompts
-- `llm_client.py` - Handles LLM API communication
-- `response_parser.py` - Parses LLM responses into actions
-- `test_bot.py` - Component testing script
-- `requirements.txt` - Python dependencies
-- `.env.example` - Environment configuration template
-
-## Configuration Options
-
-### LLM Settings
-- **Temperature**: Controls randomness (0.0 = deterministic, 1.0 = creative)
-- **Max Tokens**: Maximum response length
-- **Top-p/Top-k**: Controls response diversity
-
-### Bot Settings
-- **Battle Format**: Currently supports "gen8randombattle"
-- **Concurrent Battles**: Number of simultaneous battles (recommended: 1)
-- **Ladder Games**: Number of games to play in ladder mode
-
-## Extending the Bot
 
 ### Adding New LLM Providers
-1. Implement a new client class in `llm_client.py`
-2. Add provider selection logic in `create_llm_client()`
+1. Implement client class in `llm_client.py`
+2. Add provider selection logic
 3. Update environment configuration
 
-### Improving Prompts
-Modify `state_processor.py` to include additional battle information:
-- Move effectiveness calculations
-- Advanced stat calculations
-- Historical battle data
-- Team composition analysis
+### Extending Bot Capabilities
+- Modify `state_processor.py` for better prompts
+- Enhance `response_parser.py` for natural language
+- Add custom battle strategies
 
-### Enhanced Parsing
-Extend `response_parser.py` to handle:
-- More natural language variations
-- Multi-step strategies
-- Conditional actions
-
-## Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **ImportError: No module named 'google.generativeai'**
-   - Run: `pip install google-generativeai`
-
-2. **LLM client is not available**
-   - Check your `GEMINI_API_KEY` in `.env`
-   - Or set `USE_MOCK_LLM=true` for testing
-
-3. **Connection errors**
-   - Verify `PS_SERVER_URL` is correct
-   - Check if Pokemon Showdown server is running
-
-4. **Invalid moves**
-   - The bot includes fallback logic for invalid actions
-   - Check logs for parsing issues
-
-### Debug Mode
-
-Enable detailed logging by modifying the logging level in `bot.py`:
-```python
-logging.basicConfig(level=logging.DEBUG)
+**Import errors**
+```bash
+pip install -r requirements.txt
 ```
 
-## Performance Considerations
+**API key issues**
+- Check your API keys in `.env`
+- Use `USE_MOCK_LLM=true` for testing
 
-- LLM API calls add latency (~1-3 seconds per decision)
-- Consider using faster models for time-sensitive battles
+**Connection errors**
+- Verify Pokemon Showdown server is running
+- Check `PS_SERVER_URL` configuration
+
+**Battle failures**
+- Enable debug logging in bot files
+- Check logs for parsing issues
+
+### Debug Mode
+```bash
+python run_bot_vs_bot.py --mode single --verbose
+```
+
+## 📈 Performance Tips
+
+- Use faster LLM models for time-sensitive battles
 - Monitor API usage and costs
-- The mock LLM is much faster for development/testing
+- Adjust concurrent battle limits based on resources
+- Use mock LLM for development and testing
 
-## Contributing
+## 🤝 Contributing
 
-To contribute:
-1. Test your changes with `python test_bot.py`
-2. Ensure the bot works with both mock and real LLM
+1. Test changes with both single and bot vs bot modes
+2. Ensure compatibility with mock and real LLMs
 3. Update documentation for new features
-4. Follow the existing code structure and patterns
+4. Follow existing code patterns
 
-## License
+## 📄 License
 
 This project is for educational purposes. Please respect Pokemon Showdown's terms of service when using automated players.
+
+---
+
+For detailed documentation on specific features, see:
+- [Bot vs Bot System](README_BOT_VS_BOT.md)
+- [Leaderboard Documentation](leaderboardREADME.md)

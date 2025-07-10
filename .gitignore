@@ -52,6 +52,11 @@ scratchpad.md
 *_data.json
 demo_*.json
 results/
+battle_analysis/
+
+# Server and battle logs
+server.log
+*.log
 
 # Claude Code settings
 .claude/settings.local.json
