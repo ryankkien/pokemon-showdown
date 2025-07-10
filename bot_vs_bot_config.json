@@ -11,56 +11,115 @@
   "auto_save_results": true,
   "bot_configs": [
     {
-      "username": "GeminiBot",
+      "username": "Claude3Opus",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": true,
-      "llm_provider": "gemini",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "Gemini-powered bot"
-      }
-    },
-    {
-      "username": "OpenAIBot",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": true,
-      "llm_provider": "openai",
-      "max_concurrent_battles": 1,
-      "custom_config": {
-        "description": "OpenAI-powered bot"
-      }
-    },
-    {
-      "username": "AnthropicBot",
-      "battle_format": "gen9randombattle",
-      "use_mock_llm": true,
+      "use_mock_llm": false,
       "llm_provider": "anthropic",
+      "model": "claude-3-opus-20240229",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Anthropic-powered bot"
+        "description": "Claude 3 Opus - Most capable Anthropic model"
       }
     },
     {
-      "username": "OllamaBot",
+      "username": "Claude3Sonnet",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": true,
-      "llm_provider": "ollama",
+      "use_mock_llm": false,
+      "llm_provider": "anthropic",
+      "model": "claude-3-sonnet-20240229",
       "max_concurrent_battles": 1,
       "custom_config": {
-        "description": "Ollama-powered bot"
+        "description": "Claude 3 Sonnet - Balanced Anthropic model"
+      }
+    },
+    {
+      "username": "Claude3Haiku",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "anthropic",
+      "model": "claude-3-haiku-20240307",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Claude 3 Haiku - Fast Anthropic model"
+      }
+    },
+    {
+      "username": "GPT4Turbo",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "openai",
+      "model": "gpt-4-turbo-preview",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "GPT-4 Turbo - Latest OpenAI model"
+      }
+    },
+    {
+      "username": "GPT4",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "openai",
+      "model": "gpt-4",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "GPT-4 - Standard OpenAI model"
+      }
+    },
+    {
+      "username": "GPT35Turbo",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "openai",
+      "model": "gpt-3.5-turbo",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "GPT-3.5 Turbo - Fast OpenAI model"
+      }
+    },
+    {
+      "username": "GeminiPro",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "gemini",
+      "model": "gemini-pro",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Gemini Pro - Google's advanced model"
+      }
+    },
+    {
+      "username": "Gemini15Pro",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "gemini",
+      "model": "gemini-1.5-pro",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Gemini 1.5 Pro - Google's latest model"
+      }
+    },
+    {
+      "username": "Gemini15Flash",
+      "battle_format": "gen9randombattle",
+      "use_mock_llm": false,
+      "llm_provider": "gemini",
+      "model": "gemini-1.5-flash",
+      "max_concurrent_battles": 1,
+      "custom_config": {
+        "description": "Gemini 1.5 Flash - Fast Google model"
       }
     }
   ],
   "tournament_config": {
-    "name": "Default Bot Tournament",
+    "name": "AI Model Battle Tournament",
     "tournament_type": "round_robin",
     "battle_format": "gen9randombattle",
-    "max_participants": 4,
+    "max_participants": 9,
     "rounds": 3,
     "time_limit_per_battle": 600,
-    "concurrent_battles": 2,
+    "concurrent_battles": 3,
     "save_replays": true,
-    "description": "Default tournament with mock LLM bots"
+    "description": "Tournament featuring multiple AI models from Anthropic, OpenAI, and Google"
   },
   "results_dir": "./results",
   "config_file": "./bot_vs_bot_config.json"
