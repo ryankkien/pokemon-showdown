@@ -1,0 +1,15 @@
+{
+  "battle_id": "9bbdb3be",
+  "bot1_name": "GPT-4-Turbo",
+  "bot2_name": "GPT-3.5-Turbo",
+  "winner": "GPT-4-Turbo",
+  "total_turns": 0,
+  "duration_seconds": 3.924031972885132,
+  "moves": [],
+  "bot1_moves": 0,
+  "bot2_moves": 0,
+  "bot1_errors": 0,
+  "bot2_errors": 0,
+  "battle_format": "gen9randombattle",
+  "timestamp": "2025-07-10T15:13:13.796893"
+}

@@ -1,0 +1,15 @@
+{
+  "battle_id": "3e04033c",
+  "bot1_name": "Gemini-1.5-Flash",
+  "bot2_name": "Gemini-1.5-Pro",
+  "winner": "Gemini-1.5-Flash",
+  "total_turns": 0,
+  "duration_seconds": 11.150301933288574,
+  "moves": [],
+  "bot1_moves": 0,
+  "bot2_moves": 0,
+  "bot1_errors": 0,
+  "bot2_errors": 0,
+  "battle_format": "gen9randombattle",
+  "timestamp": "2025-07-10T15:11:01.749233"
+}

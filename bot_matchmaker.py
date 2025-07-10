@@ -37,18 +37,36 @@ class BotStats:
     total_battles: int = 0
     win_rate: float = 0.0
     last_battle_time: float = 0.0
+    longest_win_streak: int = 0
+    current_win_streak: int = 0
+    battle_formats: Dict[str, int] = None
+    
+    def __post_init__(self):
+        """Initialize default values."""
+        if self.battle_formats is None:
+            self.battle_formats = {}
     
     def update_stats(self, result: BattleResult, is_winner: bool, is_draw: bool = False):
         """Update bot statistics based on battle result."""
         self.total_battles += 1
         self.last_battle_time = result.timestamp
         
+        # Track battle formats
+        if result.battle_format not in self.battle_formats:
+            self.battle_formats[result.battle_format] = 0
+        self.battle_formats[result.battle_format] += 1
+        
         if is_draw:
             self.draws += 1
+            self.current_win_streak = 0  # Reset streak on draw
         elif is_winner:
             self.wins += 1
+            self.current_win_streak += 1
+            if self.current_win_streak > self.longest_win_streak:
+                self.longest_win_streak = self.current_win_streak
         else:
             self.losses += 1
+            self.current_win_streak = 0  # Reset streak on loss
         
         # Calculate win rate
         if self.total_battles > 0:

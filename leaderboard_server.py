@@ -92,8 +92,56 @@ class LeaderboardManager:
             print(f"Error saving leaderboard data: {e}")
     
     def update_from_matchmaker(self, matchmaker: BotMatchmaker):
-        """Update leaderboard from matchmaker data."""
-        self.bot_stats = matchmaker.bot_stats.copy()
+        """Update leaderboard from matchmaker data, accumulating stats."""
+        # Merge stats instead of replacing
+        for username, new_stats in matchmaker.bot_stats.items():
+            if username in self.bot_stats:
+                # Accumulate stats
+                existing = self.bot_stats[username]
+                existing.wins += new_stats.wins
+                existing.losses += new_stats.losses
+                existing.draws += new_stats.draws
+                existing.total_battles += new_stats.total_battles
+                
+                # Update ELO (use latest)
+                existing.elo_rating = new_stats.elo_rating
+                
+                # Update win rate
+                if existing.total_battles > 0:
+                    existing.win_rate = (existing.wins / existing.total_battles) * 100
+                
+                # Update longest win streak if needed
+                if new_stats.longest_win_streak > existing.longest_win_streak:
+                    existing.longest_win_streak = new_stats.longest_win_streak
+                
+                # Update current streak
+                existing.current_win_streak = new_stats.current_win_streak
+                
+                # Update last battle time
+                existing.last_battle_time = max(existing.last_battle_time, new_stats.last_battle_time)
+                
+                # Update favorite format (keep the one with more battles)
+                if new_stats.battle_formats:
+                    if not existing.battle_formats:
+                        existing.battle_formats = new_stats.battle_formats.copy()
+                    else:
+                        for format_name, count in new_stats.battle_formats.items():
+                            existing.battle_formats[format_name] = existing.battle_formats.get(format_name, 0) + count
+            else:
+                # New bot - add directly
+                self.bot_stats[username] = BotStats(
+                    username=username,
+                    elo_rating=new_stats.elo_rating,
+                    wins=new_stats.wins,
+                    losses=new_stats.losses,
+                    draws=new_stats.draws,
+                    total_battles=new_stats.total_battles,
+                    win_rate=new_stats.win_rate,
+                    longest_win_streak=new_stats.longest_win_streak,
+                    current_win_streak=new_stats.current_win_streak,
+                    last_battle_time=new_stats.last_battle_time,
+                    battle_formats=new_stats.battle_formats.copy() if new_stats.battle_formats else {}
+                )
         
         # Add battle results from manager
         for result in matchmaker.bot_manager.battle_results:
@@ -283,6 +331,15 @@ LEADERBOARD_HTML = """
             opacity: 0.9;
             font-size: 1.1rem;
         }
+        .persistence-note {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            border-left: 4px solid #28a745;
+            margin: 0;
+        }
         .stats-bar {
             display: flex;
             justify-content: space-around;
@@ -422,6 +479,10 @@ LEADERBOARD_HTML = """
         <div class="header">
             <h1>🤖 Bot Battle Leaderboard</h1>
             <p>Pokemon Showdown AI Tournament Rankings</p>
+        </div>
+        
+        <div class="persistence-note">
+            📊 This leaderboard accumulates statistics across all battle sessions - stats persist between runs!
         </div>
         
         <div class="stats-bar">

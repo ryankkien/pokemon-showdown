@@ -152,6 +152,15 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
     matchmaker = BotMatchmaker(manager, config_manager.config.matchmaking_strategy)
     leaderboard = LeaderboardManager()
     
+    # Load existing stats into matchmaker
+    print("Loading existing leaderboard data...")
+    for username, stats in leaderboard.bot_stats.items():
+        matchmaker.bot_stats[username] = stats
+    if leaderboard.bot_stats:
+        print(f"  Loaded stats for {len(leaderboard.bot_stats)} bots")
+    else:
+        print("  No existing stats found - starting fresh")
+    
     try:
         # Create all bots
         print("Creating bots...")
