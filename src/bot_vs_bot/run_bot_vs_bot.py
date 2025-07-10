@@ -392,7 +392,7 @@ async def main():
         leaderboard_thread = None
         if args.leaderboard:
             import threading
-            from leaderboard_server import run_server
+            from src.bot_vs_bot.leaderboard_server import run_server
             
             print(f"Starting leaderboard server on port {args.leaderboard_port}...")
             leaderboard_thread = threading.Thread(
