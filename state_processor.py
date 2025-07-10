@@ -4,8 +4,8 @@ Converts poke-env Battle objects into detailed prompts for LLM decision making.
 """
 
 from typing import List, Dict, Any, Optional
-from poke_env.environment import Battle, Pokemon, Move, Effect
-from poke_env.data import GenData, Type
+from poke_env.environment import Battle, Pokemon, Move, Effect, PokemonType
+from poke_env.data import GenData
 
 
 class StateProcessor:
@@ -19,24 +19,24 @@ class StateProcessor:
         
         # Type effectiveness chart
         self.type_chart = {
-            Type.NORMAL: {Type.ROCK: 0.5, Type.GHOST: 0, Type.STEEL: 0.5},
-            Type.FIRE: {Type.FIRE: 0.5, Type.WATER: 0.5, Type.GRASS: 2, Type.ICE: 2, Type.BUG: 2, Type.ROCK: 0.5, Type.DRAGON: 0.5, Type.STEEL: 2},
-            Type.WATER: {Type.FIRE: 2, Type.WATER: 0.5, Type.GRASS: 0.5, Type.GROUND: 2, Type.ROCK: 2, Type.DRAGON: 0.5},
-            Type.ELECTRIC: {Type.WATER: 2, Type.ELECTRIC: 0.5, Type.GRASS: 0.5, Type.GROUND: 0, Type.FLYING: 2, Type.DRAGON: 0.5},
-            Type.GRASS: {Type.FIRE: 0.5, Type.WATER: 2, Type.GRASS: 0.5, Type.POISON: 0.5, Type.GROUND: 2, Type.FLYING: 0.5, Type.BUG: 0.5, Type.ROCK: 2, Type.DRAGON: 0.5, Type.STEEL: 0.5},
-            Type.ICE: {Type.FIRE: 0.5, Type.WATER: 0.5, Type.GRASS: 2, Type.ICE: 0.5, Type.GROUND: 2, Type.FLYING: 2, Type.DRAGON: 2, Type.STEEL: 0.5},
-            Type.FIGHTING: {Type.NORMAL: 2, Type.ICE: 2, Type.POISON: 0.5, Type.FLYING: 0.5, Type.PSYCHIC: 0.5, Type.BUG: 0.5, Type.ROCK: 2, Type.GHOST: 0, Type.DARK: 2, Type.STEEL: 2, Type.FAIRY: 0.5},
-            Type.POISON: {Type.GRASS: 2, Type.POISON: 0.5, Type.GROUND: 0.5, Type.ROCK: 0.5, Type.GHOST: 0.5, Type.STEEL: 0, Type.FAIRY: 2},
-            Type.GROUND: {Type.FIRE: 2, Type.ELECTRIC: 2, Type.GRASS: 0.5, Type.POISON: 2, Type.FLYING: 0, Type.BUG: 0.5, Type.ROCK: 2, Type.STEEL: 2},
-            Type.FLYING: {Type.ELECTRIC: 0.5, Type.GRASS: 2, Type.FIGHTING: 2, Type.BUG: 2, Type.ROCK: 0.5, Type.STEEL: 0.5},
-            Type.PSYCHIC: {Type.FIGHTING: 2, Type.POISON: 2, Type.PSYCHIC: 0.5, Type.DARK: 0, Type.STEEL: 0.5},
-            Type.BUG: {Type.FIRE: 0.5, Type.GRASS: 2, Type.FIGHTING: 0.5, Type.POISON: 0.5, Type.FLYING: 0.5, Type.PSYCHIC: 2, Type.GHOST: 0.5, Type.DARK: 2, Type.STEEL: 0.5, Type.FAIRY: 0.5},
-            Type.ROCK: {Type.FIRE: 2, Type.ICE: 2, Type.FIGHTING: 0.5, Type.GROUND: 0.5, Type.FLYING: 2, Type.BUG: 2, Type.STEEL: 0.5},
-            Type.GHOST: {Type.NORMAL: 0, Type.PSYCHIC: 2, Type.GHOST: 2, Type.DARK: 0.5},
-            Type.DRAGON: {Type.DRAGON: 2, Type.STEEL: 0.5, Type.FAIRY: 0},
-            Type.DARK: {Type.FIGHTING: 0.5, Type.PSYCHIC: 2, Type.GHOST: 2, Type.DARK: 0.5, Type.FAIRY: 0.5},
-            Type.STEEL: {Type.FIRE: 0.5, Type.WATER: 0.5, Type.ELECTRIC: 0.5, Type.ICE: 2, Type.ROCK: 2, Type.STEEL: 0.5, Type.FAIRY: 2},
-            Type.FAIRY: {Type.FIRE: 0.5, Type.FIGHTING: 2, Type.POISON: 0.5, Type.DRAGON: 2, Type.DARK: 2, Type.STEEL: 0.5}
+            PokemonType.NORMAL: {PokemonType.ROCK: 0.5, PokemonType.GHOST: 0, PokemonType.STEEL: 0.5},
+            PokemonType.FIRE: {PokemonType.FIRE: 0.5, PokemonType.WATER: 0.5, PokemonType.GRASS: 2, PokemonType.ICE: 2, PokemonType.BUG: 2, PokemonType.ROCK: 0.5, PokemonType.DRAGON: 0.5, PokemonType.STEEL: 2},
+            PokemonType.WATER: {PokemonType.FIRE: 2, PokemonType.WATER: 0.5, PokemonType.GRASS: 0.5, PokemonType.GROUND: 2, PokemonType.ROCK: 2, PokemonType.DRAGON: 0.5},
+            PokemonType.ELECTRIC: {PokemonType.WATER: 2, PokemonType.ELECTRIC: 0.5, PokemonType.GRASS: 0.5, PokemonType.GROUND: 0, PokemonType.FLYING: 2, PokemonType.DRAGON: 0.5},
+            PokemonType.GRASS: {PokemonType.FIRE: 0.5, PokemonType.WATER: 2, PokemonType.GRASS: 0.5, PokemonType.POISON: 0.5, PokemonType.GROUND: 2, PokemonType.FLYING: 0.5, PokemonType.BUG: 0.5, PokemonType.ROCK: 2, PokemonType.DRAGON: 0.5, PokemonType.STEEL: 0.5},
+            PokemonType.ICE: {PokemonType.FIRE: 0.5, PokemonType.WATER: 0.5, PokemonType.GRASS: 2, PokemonType.ICE: 0.5, PokemonType.GROUND: 2, PokemonType.FLYING: 2, PokemonType.DRAGON: 2, PokemonType.STEEL: 0.5},
+            PokemonType.FIGHTING: {PokemonType.NORMAL: 2, PokemonType.ICE: 2, PokemonType.POISON: 0.5, PokemonType.FLYING: 0.5, PokemonType.PSYCHIC: 0.5, PokemonType.BUG: 0.5, PokemonType.ROCK: 2, PokemonType.GHOST: 0, PokemonType.DARK: 2, PokemonType.STEEL: 2, PokemonType.FAIRY: 0.5},
+            PokemonType.POISON: {PokemonType.GRASS: 2, PokemonType.POISON: 0.5, PokemonType.GROUND: 0.5, PokemonType.ROCK: 0.5, PokemonType.GHOST: 0.5, PokemonType.STEEL: 0, PokemonType.FAIRY: 2},
+            PokemonType.GROUND: {PokemonType.FIRE: 2, PokemonType.ELECTRIC: 2, PokemonType.GRASS: 0.5, PokemonType.POISON: 2, PokemonType.FLYING: 0, PokemonType.BUG: 0.5, PokemonType.ROCK: 2, PokemonType.STEEL: 2},
+            PokemonType.FLYING: {PokemonType.ELECTRIC: 0.5, PokemonType.GRASS: 2, PokemonType.FIGHTING: 2, PokemonType.BUG: 2, PokemonType.ROCK: 0.5, PokemonType.STEEL: 0.5},
+            PokemonType.PSYCHIC: {PokemonType.FIGHTING: 2, PokemonType.POISON: 2, PokemonType.PSYCHIC: 0.5, PokemonType.DARK: 0, PokemonType.STEEL: 0.5},
+            PokemonType.BUG: {PokemonType.FIRE: 0.5, PokemonType.GRASS: 2, PokemonType.FIGHTING: 0.5, PokemonType.POISON: 0.5, PokemonType.FLYING: 0.5, PokemonType.PSYCHIC: 2, PokemonType.GHOST: 0.5, PokemonType.DARK: 2, PokemonType.STEEL: 0.5, PokemonType.FAIRY: 0.5},
+            PokemonType.ROCK: {PokemonType.FIRE: 2, PokemonType.ICE: 2, PokemonType.FIGHTING: 0.5, PokemonType.GROUND: 0.5, PokemonType.FLYING: 2, PokemonType.BUG: 2, PokemonType.STEEL: 0.5},
+            PokemonType.GHOST: {PokemonType.NORMAL: 0, PokemonType.PSYCHIC: 2, PokemonType.GHOST: 2, PokemonType.DARK: 0.5},
+            PokemonType.DRAGON: {PokemonType.DRAGON: 2, PokemonType.STEEL: 0.5, PokemonType.FAIRY: 0},
+            PokemonType.DARK: {PokemonType.FIGHTING: 0.5, PokemonType.PSYCHIC: 2, PokemonType.GHOST: 2, PokemonType.DARK: 0.5, PokemonType.FAIRY: 0.5},
+            PokemonType.STEEL: {PokemonType.FIRE: 0.5, PokemonType.WATER: 0.5, PokemonType.ELECTRIC: 0.5, PokemonType.ICE: 2, PokemonType.ROCK: 2, PokemonType.STEEL: 0.5, PokemonType.FAIRY: 2},
+            PokemonType.FAIRY: {PokemonType.FIRE: 0.5, PokemonType.FIGHTING: 2, PokemonType.POISON: 0.5, PokemonType.DRAGON: 2, PokemonType.DARK: 2, PokemonType.STEEL: 0.5}
         }
     
     def create_battle_prompt(self, battle: Battle) -> str:
@@ -453,7 +453,7 @@ action: switch
 value: pikachu
 reasoning: Current Pokemon is at low HP and weak to opponent's attacks"""
     
-    def _calculate_type_effectiveness(self, attacking_type: Type, defending_types: List[Type]) -> float:
+    def _calculate_type_effectiveness(self, attacking_type: PokemonType, defending_types: List[PokemonType]) -> float:
         """Calculate type effectiveness multiplier."""
         effectiveness = 1.0
         
