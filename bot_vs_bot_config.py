@@ -185,30 +185,23 @@ class BotVsBotConfigManager:
             BotConfig(
                 username="Gemini-1.5-Flash",
                 battle_format="gen9randombattle",
-                use_mock_llm=True,
+                use_mock_llm=False,
                 llm_provider="gemini",
                 custom_config={"description": "Google Gemini 1.5 Flash model"}
             ),
             BotConfig(
                 username="GPT-4-Turbo",
                 battle_format="gen9randombattle", 
-                use_mock_llm=True,
+                use_mock_llm=False,
                 llm_provider="openai",
                 custom_config={"description": "OpenAI GPT-4 Turbo model"}
             ),
             BotConfig(
                 username="Claude-3-Opus",
                 battle_format="gen9randombattle",
-                use_mock_llm=True,
+                use_mock_llm=False,
                 llm_provider="anthropic",
                 custom_config={"description": "Anthropic Claude 3 Opus model"}
-            ),
-            BotConfig(
-                username="Llama2-Local",
-                battle_format="gen9randombattle",
-                use_mock_llm=True,
-                llm_provider="ollama",
-                custom_config={"description": "Meta Llama 2 via Ollama"}
             )
         ]
     
@@ -272,8 +265,8 @@ def create_quick_battle_config() -> BotVsBotConfig:
     """Create configuration for quick bot vs bot battles."""
     config = BotVsBotConfig()
     config.bot_configs = [
-        BotConfig(username="GPT-4-Quick", use_mock_llm=True, llm_provider="openai"),
-        BotConfig(username="Claude-3-Quick", use_mock_llm=True, llm_provider="anthropic")
+        BotConfig(username="GPT-4-Quick", use_mock_llm=False, llm_provider="openai"),
+        BotConfig(username="Claude-3-Quick", use_mock_llm=False, llm_provider="anthropic")
     ]
     return config
 
@@ -284,10 +277,9 @@ def create_tournament_config() -> BotVsBotConfig:
     
     # Add multiple bots with model names
     config.bot_configs = [
-        BotConfig(username="GPT-4-Turbo", use_mock_llm=True, llm_provider="openai"),
-        BotConfig(username="Claude-3-Opus", use_mock_llm=True, llm_provider="anthropic"),
-        BotConfig(username="Gemini-1.5-Flash", use_mock_llm=True, llm_provider="gemini"),
-        BotConfig(username="Llama2-Local", use_mock_llm=True, llm_provider="ollama")
+        BotConfig(username="GPT-4-Turbo", use_mock_llm=False, llm_provider="openai"),
+        BotConfig(username="Claude-3-Opus", use_mock_llm=False, llm_provider="anthropic"),
+        BotConfig(username="Gemini-1.5-Flash", use_mock_llm=False, llm_provider="gemini")
     ]
     
     # Configure tournament
