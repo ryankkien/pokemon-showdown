@@ -328,8 +328,9 @@ class BotManager:
         
         for username, bot in self.active_bots.items():
             try:
-                # Close bot connections
-                await bot.stop_listening()
+                # Close bot connections if method exists
+                if hasattr(bot, 'stop_listening'):
+                    await bot.stop_listening()
                 logger.info(f"Shutdown bot: {username}")
             except Exception as e:
                 logger.error(f"Error shutting down bot {username}: {e}")

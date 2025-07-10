@@ -252,6 +252,7 @@ class MockLLMClient(LLMClient):
         """Initialize mock client."""
         self.provider = "mock"
         self.model = "mock-model"
+        self.requested_model = "mock-model"
         logger.info("Mock LLM client initialized")
     
     async def get_decision(self, prompt: str, max_tokens: int = 150, temperature: float = 0.3) -> LLMResponse:
