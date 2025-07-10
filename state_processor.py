@@ -297,8 +297,8 @@ class StateProcessor:
         if hasattr(move, 'priority') and move.priority != 0:
             info += f", priority {move.priority:+d}"
         
-        if move.pp:
-            info += f", {move.current_pp}/{move.pp} PP"
+        if move.max_pp:
+            info += f", {move.current_pp}/{move.max_pp} PP"
         
         info += ")"
         

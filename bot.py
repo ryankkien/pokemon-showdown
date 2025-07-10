@@ -76,7 +76,9 @@ class LLMPlayer(Player):
                 for move in battle.available_moves:
                     if move.id == value:
                         logger.info(f"Using move: {move.id}")
-                        return self.create_order(move)
+                        # Check if Terastallize is available before using it
+                        can_tera = battle.can_tera if hasattr(battle, 'can_tera') else False
+                        return self.create_order(move, terastallize=False)  # Explicitly disable terastallize for now
                 logger.warning(f"Move {value} not found. Available moves: {[m.id for m in battle.available_moves]}")
                 return self.choose_random_move(battle)
             elif action == "switch":
