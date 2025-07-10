@@ -282,8 +282,10 @@ async def main():
                        help="Use quick battle configuration")
     parser.add_argument("--verbose", "-v", action="store_true",
                        help="Enable verbose logging")
-    parser.add_argument("--leaderboard", action="store_true",
-                       help="Start web leaderboard server alongside battles")
+    parser.add_argument("--leaderboard", action="store_true", default=True,
+                       help="Start web leaderboard server alongside battles (default: enabled)")
+    parser.add_argument("--no-leaderboard", dest="leaderboard", action="store_false",
+                       help="Disable web leaderboard server")
     parser.add_argument("--leaderboard-port", type=int, default=5000,
                        help="Port for leaderboard server")
     parser.add_argument("--duration", type=int, default=None,
