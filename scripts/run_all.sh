@@ -47,4 +47,4 @@ fi
 echo ""
 echo "Starting bot with integrated server management..."
 echo ""
-python3 run_bot.py
+cd "$(dirname "$0")/.." && python3 run_bot.py

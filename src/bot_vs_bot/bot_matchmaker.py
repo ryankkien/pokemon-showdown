@@ -12,7 +12,7 @@ from enum import Enum
 import heapq
 import json
 
-from bot_manager import BotManager, BotConfig, BattleResult, BattleMode
+from src.bot_vs_bot.bot_manager import BotManager, BotConfig, BattleResult, BattleMode
 
 logger = logging.getLogger(__name__)
 

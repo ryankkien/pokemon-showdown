@@ -14,16 +14,16 @@ from poke_env.player import Player
 from poke_env.environment import Battle
 from poke_env.ps_client.server_configuration import ServerConfiguration
 
-from state_processor import StateProcessor
-from llm_client import create_llm_client, LLMClient
-from response_parser import ResponseParser
-from battle_tracker import battle_tracker
+from src.bot.state_processor import StateProcessor
+from src.bot.llm_client import create_llm_client, LLMClient
+from src.bot.response_parser import ResponseParser
+from src.utils.battle_tracker import battle_tracker
 
 # Load environment variables
 load_dotenv()
 
 # Configure enhanced logging
-from logging_config import setup_enhanced_logging
+from src.utils.logging_config import setup_enhanced_logging
 setup_enhanced_logging()
 
 logger = logging.getLogger(__name__)

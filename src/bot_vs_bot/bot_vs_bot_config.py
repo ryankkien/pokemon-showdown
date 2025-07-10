@@ -9,8 +9,8 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
 
-from bot_manager import BotConfig
-from bot_matchmaker import MatchmakingStrategy
+from src.bot_vs_bot.bot_manager import BotConfig
+from src.bot_vs_bot.bot_matchmaker import MatchmakingStrategy
 
 
 class TournamentType(Enum):

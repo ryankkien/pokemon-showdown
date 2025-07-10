@@ -12,10 +12,10 @@ from enum import Enum
 import json
 import time
 
-from bot import LLMPlayer
+from src.bot.bot import LLMPlayer
 from poke_env.ps_client.server_configuration import ServerConfiguration
 from poke_env.ps_client.account_configuration import AccountConfiguration
-from battle_tracker import battle_tracker
+from src.utils.battle_tracker import battle_tracker
 
 logger = logging.getLogger(__name__)
 

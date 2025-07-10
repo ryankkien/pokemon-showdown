@@ -6,7 +6,7 @@ An AI-powered Pokemon Showdown bot system that uses Large Language Models to mak
 
 ### All-in-One Setup
 ```bash
-./run_all.sh
+./scripts/run_all.sh
 ```
 
 This single command will:
@@ -38,23 +38,16 @@ python run_bot_vs_bot.py --mode continuous --leaderboard
 
 ## 📁 Project Structure
 
-### Core Components
-- **`bot.py`** - Main bot implementation with LLMPlayer class
-- **`state_processor.py`** - Converts battle state to LLM prompts
-- **`llm_client.py`** - Handles LLM API communication
-- **`response_parser.py`** - Parses LLM responses into actions
+The codebase is organized into logical folders for better maintainability:
 
-### Bot vs Bot System
-- **`bot_manager.py`** - Manages multiple bot instances
-- **`bot_matchmaker.py`** - Advanced matchmaking with ELO ratings
-- **`bot_vs_bot_config.py`** - Configuration management
-- **`run_bot_vs_bot.py`** - Main bot vs bot script
-- **`leaderboard_server.py`** - Web-based leaderboard
+- **`src/bot/`** - Core bot functionality
+- **`src/bot_vs_bot/`** - Bot vs Bot battle system  
+- **`src/utils/`** - Shared utilities
+- **`tests/`** - Test files
+- **`scripts/`** - Shell scripts
+- **`docs/`** - Documentation
 
-### Configuration & Testing
-- **`test_bot.py`** - Single bot testing
-- **`test_bot_vs_bot.py`** - Bot vs bot testing
-- **`requirements.txt`** - Python dependencies
+See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed file organization.
 
 ## 🎮 Battle Modes
 
