@@ -5,7 +5,7 @@ Converts poke-env Battle objects into detailed prompts for LLM decision making.
 
 from typing import List, Dict, Any, Optional
 from poke_env.environment import Battle, Pokemon, Move, Effect
-from poke_env.data import GenData
+from poke_env.data import GenData, Type
 
 
 class StateProcessor:
@@ -16,6 +16,28 @@ class StateProcessor:
     def __init__(self):
         """Initialize the state processor."""
         self.gen_data = GenData.from_gen(8)  # Gen 8 data
+        
+        # Type effectiveness chart
+        self.type_chart = {
+            Type.NORMAL: {Type.ROCK: 0.5, Type.GHOST: 0, Type.STEEL: 0.5},
+            Type.FIRE: {Type.FIRE: 0.5, Type.WATER: 0.5, Type.GRASS: 2, Type.ICE: 2, Type.BUG: 2, Type.ROCK: 0.5, Type.DRAGON: 0.5, Type.STEEL: 2},
+            Type.WATER: {Type.FIRE: 2, Type.WATER: 0.5, Type.GRASS: 0.5, Type.GROUND: 2, Type.ROCK: 2, Type.DRAGON: 0.5},
+            Type.ELECTRIC: {Type.WATER: 2, Type.ELECTRIC: 0.5, Type.GRASS: 0.5, Type.GROUND: 0, Type.FLYING: 2, Type.DRAGON: 0.5},
+            Type.GRASS: {Type.FIRE: 0.5, Type.WATER: 2, Type.GRASS: 0.5, Type.POISON: 0.5, Type.GROUND: 2, Type.FLYING: 0.5, Type.BUG: 0.5, Type.ROCK: 2, Type.DRAGON: 0.5, Type.STEEL: 0.5},
+            Type.ICE: {Type.FIRE: 0.5, Type.WATER: 0.5, Type.GRASS: 2, Type.ICE: 0.5, Type.GROUND: 2, Type.FLYING: 2, Type.DRAGON: 2, Type.STEEL: 0.5},
+            Type.FIGHTING: {Type.NORMAL: 2, Type.ICE: 2, Type.POISON: 0.5, Type.FLYING: 0.5, Type.PSYCHIC: 0.5, Type.BUG: 0.5, Type.ROCK: 2, Type.GHOST: 0, Type.DARK: 2, Type.STEEL: 2, Type.FAIRY: 0.5},
+            Type.POISON: {Type.GRASS: 2, Type.POISON: 0.5, Type.GROUND: 0.5, Type.ROCK: 0.5, Type.GHOST: 0.5, Type.STEEL: 0, Type.FAIRY: 2},
+            Type.GROUND: {Type.FIRE: 2, Type.ELECTRIC: 2, Type.GRASS: 0.5, Type.POISON: 2, Type.FLYING: 0, Type.BUG: 0.5, Type.ROCK: 2, Type.STEEL: 2},
+            Type.FLYING: {Type.ELECTRIC: 0.5, Type.GRASS: 2, Type.FIGHTING: 2, Type.BUG: 2, Type.ROCK: 0.5, Type.STEEL: 0.5},
+            Type.PSYCHIC: {Type.FIGHTING: 2, Type.POISON: 2, Type.PSYCHIC: 0.5, Type.DARK: 0, Type.STEEL: 0.5},
+            Type.BUG: {Type.FIRE: 0.5, Type.GRASS: 2, Type.FIGHTING: 0.5, Type.POISON: 0.5, Type.FLYING: 0.5, Type.PSYCHIC: 2, Type.GHOST: 0.5, Type.DARK: 2, Type.STEEL: 0.5, Type.FAIRY: 0.5},
+            Type.ROCK: {Type.FIRE: 2, Type.ICE: 2, Type.FIGHTING: 0.5, Type.GROUND: 0.5, Type.FLYING: 2, Type.BUG: 2, Type.STEEL: 0.5},
+            Type.GHOST: {Type.NORMAL: 0, Type.PSYCHIC: 2, Type.GHOST: 2, Type.DARK: 0.5},
+            Type.DRAGON: {Type.DRAGON: 2, Type.STEEL: 0.5, Type.FAIRY: 0},
+            Type.DARK: {Type.FIGHTING: 0.5, Type.PSYCHIC: 2, Type.GHOST: 2, Type.DARK: 0.5, Type.FAIRY: 0.5},
+            Type.STEEL: {Type.FIRE: 0.5, Type.WATER: 0.5, Type.ELECTRIC: 0.5, Type.ICE: 2, Type.ROCK: 2, Type.STEEL: 0.5, Type.FAIRY: 2},
+            Type.FAIRY: {Type.FIRE: 0.5, Type.FIGHTING: 2, Type.POISON: 0.5, Type.DRAGON: 2, Type.DARK: 2, Type.STEEL: 0.5}
+        }
     
     def create_battle_prompt(self, battle: Battle) -> str:
         """
@@ -30,6 +52,12 @@ class StateProcessor:
         prompt_parts = [
             "You are a master Pokémon strategist. Your goal is to win this Pokémon battle.",
             "Analyze the current battle state carefully and choose the best action.",
+            "",
+            "**Key Principles:**",
+            "- Type advantages are crucial: 2x damage for super effective, 0.5x for not very effective, 0x for immunity",
+            "- STAB (Same Type Attack Bonus) gives 1.5x damage when a Pokemon uses a move matching its type",
+            "- Speed determines turn order unless priority moves are used",
+            "- Consider the long-term win condition, not just immediate damage",
             "",
             self._get_active_pokemon_info(battle),
             self._get_opponent_info(battle),
@@ -84,6 +112,14 @@ class StateProcessor:
         info += f"  - Moves:\n"
         for i, move in enumerate(pokemon.moves.values(), 1):
             move_info = self._get_move_info(move)
+            # Add effectiveness hint if opponent is active
+            if battle.opponent_active_pokemon and move.type:
+                effectiveness = self._calculate_type_effectiveness(
+                    move.type, 
+                    battle.opponent_active_pokemon.types if battle.opponent_active_pokemon.types else []
+                )
+                if effectiveness != 1.0:
+                    move_info += f" [vs opponent: {effectiveness}x]"
             info += f"    {i}. {move_info}\n"
         
         # Boosts/stat changes
@@ -256,6 +292,10 @@ class StateProcessor:
         
         if move.accuracy and move.accuracy < 100:
             info += f", {move.accuracy}% accuracy"
+            
+        # Add priority information
+        if hasattr(move, 'priority') and move.priority != 0:
+            info += f", priority {move.priority:+d}"
         
         if move.pp:
             info += f", {move.current_pp}/{move.pp} PP"
@@ -265,20 +305,134 @@ class StateProcessor:
         # Add effect description if available
         if move.effect:
             info += f" - {move.effect}"
+            
+        # Add strategic notes for common moves
+        strategic_notes = {
+            "stealthrock": "Sets hazards, damages on switch-in",
+            "uturn": "Switches out after damage, maintains momentum",
+            "voltswitch": "Switches out after damage, maintains momentum", 
+            "protect": "Blocks attacks this turn, scouts moves",
+            "substitute": "Creates decoy, blocks status",
+            "swordsdance": "Sharply raises Attack (+2)",
+            "dragondance": "Raises Attack and Speed (+1 each)",
+            "calmmind": "Raises Sp.Atk and Sp.Def (+1 each)",
+            "recover": "Restores 50% HP",
+            "roost": "Restores 50% HP, loses Flying type this turn",
+            "toxic": "Badly poisons (increasing damage)",
+            "thunderwave": "Paralyzes, reduces speed by 50%",
+            "willowisp": "Burns, halves physical attack",
+            "taunt": "Prevents status moves for 3 turns",
+            "defog": "Removes hazards from both sides",
+            "rapidspin": "Removes hazards from your side"
+        }
+        
+        if move.id in strategic_notes:
+            info += f" [{strategic_notes[move.id]}]"
         
         return info
     
     def _get_strategic_considerations(self) -> str:
         """Add strategic thinking prompts."""
         return """
+**Type Effectiveness Chart:**
+```
+Super Effective (2x): Fire→Grass/Bug/Steel/Ice, Water→Fire/Ground/Rock, Grass→Water/Ground/Rock
+Electric→Water/Flying, Ice→Grass/Ground/Flying/Dragon, Fighting→Normal/Ice/Rock/Dark/Steel
+Poison→Grass/Fairy, Ground→Fire/Electric/Poison/Rock/Steel, Flying→Grass/Fighting/Bug
+Psychic→Fighting/Poison, Bug→Grass/Psychic/Dark, Rock→Fire/Ice/Flying/Bug
+Ghost→Psychic/Ghost, Dragon→Dragon, Dark→Psychic/Ghost, Steel→Ice/Rock/Fairy, Fairy→Fighting/Dragon/Dark
+
+Not Very Effective (0.5x): Fire→Water/Rock/Dragon, Water→Grass/Dragon, Grass→Fire/Flying/Poison/Bug/Steel/Dragon
+Electric→Grass/Ground/Dragon, Ice→Fire/Water/Steel, Fighting→Flying/Poison/Psychic/Bug/Fairy
+Poison→Poison/Ground/Rock/Ghost, Ground→Grass/Bug, Flying→Electric/Rock/Steel
+Psychic→Psychic/Steel, Bug→Fire/Fighting/Flying/Poison/Ghost/Steel/Fairy
+Rock→Fighting/Ground/Steel, Ghost→Dark, Dragon→Steel, Dark→Fighting/Dark/Fairy
+Steel→Fire/Water/Electric/Steel, Fairy→Fire/Poison/Steel
+
+No Effect (0x): Normal→Ghost, Electric→Ground, Fighting→Ghost, Poison→Steel
+Ground→Flying, Psychic→Dark, Ghost→Normal, Dragon→Fairy
+```
+
+**Damage Calculation Guide:**
+Approximate damage = (Move Power × STAB × Type Effectiveness × Stat Ratio)
+- STAB (Same Type Attack Bonus): 1.5x if move type matches Pokemon type
+- Critical hits: 1.5x damage (ignore defensive boosts)
+- Weather boosts: 1.5x (Sun→Fire, Rain→Water)
+- Abilities can modify damage (e.g., Overgrow boosts Grass moves at low HP)
+
+Quick KO estimation:
+- 4x super effective STAB move: Usually OHKOs
+- 2x super effective STAB move: ~50-70% damage
+- Neutral STAB move: ~25-40% damage
+- Not very effective: ~10-20% damage
+
+**Key Game Mechanics:**
+1. **Speed & Priority**: Faster Pokemon moves first. Priority moves go before normal moves:
+   - +2: Extreme Speed
+   - +1: Quick Attack, Aqua Jet, Bullet Punch, Mach Punch, Ice Shard, Shadow Sneak
+   - -1: Vital Throw
+   - -4: Trick Room reverses speed order
+   - -5: Counter, Mirror Coat
+   - -6: Roar, Whirlwind, Dragon Tail, Circle Throw
+
+2. **Status Conditions:**
+   - Burn: -50% physical attack, chip damage
+   - Paralysis: -50% speed, 25% chance to not move
+   - Sleep: Can't move for 1-3 turns (Rest: 2 turns)
+   - Poison: Chip damage each turn
+   - Toxic: Increasing damage (1/16, 2/16, 3/16...)
+   - Freeze: Can't move until thawed
+
+3. **Entry Hazards:**
+   - Stealth Rock: Rock-type damage on switch (12.5% neutral, up to 50%)
+   - Spikes: Ground damage (1 layer=12.5%, 2=16.7%, 3=25%)
+   - Toxic Spikes: Poisons (1 layer) or badly poisons (2 layers)
+   - Sticky Web: -1 Speed on switch
+
+4. **Important Abilities:**
+   - Intimidate: -1 Attack on switch-in
+   - Levitate: Immune to Ground moves
+   - Sturdy: Survive OHKO at full HP
+   - Magic Guard: No indirect damage
+   - Regenerator: Heal 33% on switch
+   - Prankster: +1 priority to status moves
+
+**Meta-Game Context:**
+1. **Common Roles:**
+   - Setup Sweeper: Boosts stats then sweeps (e.g., Dragon Dance, Swords Dance)
+   - Wall: High defenses, recovery moves
+   - Pivot: U-turn/Volt Switch for momentum
+   - Revenge Killer: Fast/priority to KO weakened foes
+   - Hazard Setter/Remover: Controls field
+   - Weather Setter: Enables weather teams
+
+2. **Win Conditions:**
+   - Eliminate opponent's answers to your win condition Pokemon
+   - Set up a sweeper when checks are gone
+   - Chip damage + priority move finishes
+   - Stall with defensive Pokemon + hazards
+
+**Situational Strategies:**
+- vs Setup Sweeper: Use status moves (Thunder Wave), Haze, or revenge kill
+- vs Stall: Use Taunt, setup moves, or wallbreakers
+- vs Weather: Change weather or use Pokemon that benefit
+- Low HP situations: Consider if you can tank a hit or need to switch
+- Speed ties: Both Pokemon same speed = 50/50 who goes first
+
+**Prediction Guidelines:**
+- Opponent has Water-type in back → they'll likely switch if you have Electric move
+- Opponent's Pokemon is setup bait → they might switch to prevent your setup
+- You threaten KO → opponent likely to switch to a resist/immunity
+- Consider risk/reward: Safe play vs prediction
+
 **Strategic Considerations:**
-- Consider type effectiveness and STAB (Same Type Attack Bonus)
-- Think about stat changes, abilities, and status conditions
-- Evaluate speed tiers and priority moves
-- Consider switching if your current Pokemon is at a disadvantage
-- Think about preserving key team members for later
-- Consider hazards, weather, and field effects
-- Plan for the opponent's likely next move"""
+- Calculate if you can KO before making aggressive plays
+- Preserve win conditions and checks to opponent's threats  
+- Manage hazards - when to set, when to remove
+- Track opponent's move PP for stall situations
+- Consider team preview - what's their likely lead and win condition?
+- Momentum is key - force switches to rack up hazard damage
+- Don't reveal all moves early unless necessary"""
     
     def _get_response_format(self) -> str:
         """Specify the expected response format."""
@@ -298,3 +452,14 @@ reasoning: Super effective against opponent's Grass-type Pokemon
 action: switch  
 value: pikachu
 reasoning: Current Pokemon is at low HP and weak to opponent's attacks"""
+    
+    def _calculate_type_effectiveness(self, attacking_type: Type, defending_types: List[Type]) -> float:
+        """Calculate type effectiveness multiplier."""
+        effectiveness = 1.0
+        
+        for def_type in defending_types:
+            if attacking_type in self.type_chart and def_type in self.type_chart[attacking_type]:
+                effectiveness *= self.type_chart[attacking_type][def_type]
+            # If not in chart, it's neutral (1x)
+        
+        return effectiveness
