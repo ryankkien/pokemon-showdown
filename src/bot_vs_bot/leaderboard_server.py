@@ -664,9 +664,12 @@ def api_update():
         
         if 'bot_stats' in data:
             for username, stats_data in data['bot_stats'].items():
+                # Remove username from stats_data if it exists to avoid duplicate
+                stats_copy = stats_data.copy()
+                stats_copy.pop('username', None)
                 leaderboard_manager.bot_stats[username] = BotStats(
                     username=username,
-                    **stats_data
+                    **stats_copy
                 )
         
         if 'battle_results' in data:
