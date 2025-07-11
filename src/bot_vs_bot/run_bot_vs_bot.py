@@ -21,13 +21,16 @@ from src.bot_vs_bot.leaderboard_server import LeaderboardManager
 running = True
 manager = None
 matchmaker = None
+stop_event = None
 
 
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully."""
-    global running
+    global running, stop_event
     print(f"\nReceived signal {signum}. Shutting down gracefully...")
     running = False
+    if stop_event:
+        stop_event.set()
 
 
 async def run_single_battle(config_manager: BotVsBotConfigManager):
@@ -169,7 +172,7 @@ async def _send_update_to_web_server(matchmaker, port: int = 5000):
 
 async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None, leaderboard_port: int = 5000):
     """Run continuous matchmaking system."""
-    global running, manager, matchmaker
+    global running, manager, matchmaker, stop_event
     
     print("Starting continuous matchmaking system...")
     print(f"Bots: {[bot.username for bot in config_manager.config.bot_configs]}")
@@ -217,10 +220,13 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
             )
             matchmaker.add_match_request(request)
         
+        # Create stop event for coordinated shutdown
+        stop_event = asyncio.Event()
+        
         # Start continuous matchmaking
         print("Starting continuous matchmaking loop...")
         matchmaking_task = asyncio.create_task(
-            matchmaker.run_continuous_matchmaking(interval=15.0)
+            matchmaker.run_continuous_matchmaking(interval=15.0, stop_event=stop_event)
         )
         
         # Monitor and add periodic match requests
@@ -233,6 +239,7 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
             if end_time and time.time() >= end_time:
                 print(f"\nDuration of {duration_minutes} minutes elapsed. Shutting down...")
                 running = False
+                stop_event.set()  # Signal matchmaker to stop
                 break
                 
             await asyncio.sleep(5)  # Check every 5 seconds for better responsiveness
@@ -276,8 +283,20 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
                         )
                         matchmaker.add_match_request(request)
         
-        # Cancel matchmaking task
-        matchmaking_task.cancel()
+        # Stop matchmaking gracefully
+        stop_event.set()
+        
+        # Wait for matchmaking task to finish, with timeout
+        try:
+            await asyncio.wait_for(matchmaking_task, timeout=10.0)
+            print("Matchmaking stopped gracefully")
+        except asyncio.TimeoutError:
+            print("Matchmaking task timeout, force cancelling...")
+            matchmaking_task.cancel()
+            try:
+                await matchmaking_task
+            except asyncio.CancelledError:
+                pass
         
         # Final stats
         print("\n=== Final Results ===")
@@ -310,8 +329,14 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
     
     except Exception as e:
         print(f"Error in continuous matchmaking: {e}")
+        # Make sure to stop matchmaking on error
+        if 'stop_event' in locals():
+            stop_event.set()
         raise
     finally:
+        # Ensure matchmaking is stopped in all cases
+        if 'stop_event' in locals():
+            stop_event.set()
         if manager:
             await manager.shutdown()
 

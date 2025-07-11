@@ -479,16 +479,21 @@ class BotMatchmaker:
             for bot in bots
         ]
     
-    async def run_continuous_matchmaking(self, interval: float = 10.0):
+    async def run_continuous_matchmaking(self, interval: float = 10.0, stop_event: asyncio.Event = None):
         """
         Run continuous matchmaking loop.
         
         Args:
             interval: Seconds between matchmaking cycles
+            stop_event: Event to signal when to stop matchmaking
         """
         logger.info("Starting continuous matchmaking...")
         
         while True:
+            # Check if we should stop
+            if stop_event and stop_event.is_set():
+                logger.info("Stop event received, ending matchmaking")
+                break
             try:
                 # Process match queue
                 await self._process_match_queue()
@@ -507,6 +512,10 @@ class BotMatchmaker:
                 
             except Exception as e:
                 logger.error(f"Error in matchmaking loop: {e}")
+                # Check stop event even after error
+                if stop_event and stop_event.is_set():
+                    logger.info("Stop event received after error, ending matchmaking")
+                    break
                 await asyncio.sleep(interval)
     
     def save_stats(self, filename: str):
