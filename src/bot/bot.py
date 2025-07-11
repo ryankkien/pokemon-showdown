@@ -67,6 +67,7 @@ class LLMPlayer(Player):
             The chosen move order
         """
         max_retries = 2
+        failed_attempts = []
         
         for attempt in range(max_retries + 1):
             try:
@@ -74,7 +75,19 @@ class LLMPlayer(Player):
                 prompt = self._create_prompt(battle)
                 if attempt > 0:
                     # Add error context to the prompt for retries
-                    prompt += f"\n\nIMPORTANT: Previous attempt failed. Make sure to choose ONLY from the available moves and switches listed above. Do not use moves that are not in the 'Available Actions' section."
+                    available_move_ids = [move.id for move in battle.available_moves] if battle.available_moves else []
+                    available_switch_names = [pokemon.species for pokemon in battle.available_switches] if battle.available_switches else []
+                    
+                    prompt += f"\n\nIMPORTANT: Previous attempt(s) failed. Here's what went wrong:\n"
+                    for i, (failed_action, failed_value, reason) in enumerate(failed_attempts, 1):
+                        prompt += f"{i}. Tried {failed_action} '{failed_value}' - {reason}\n"
+                    
+                    prompt += f"\n**VALID OPTIONS ONLY:**\n"
+                    if available_move_ids:
+                        prompt += f"Available moves (use EXACT names): {', '.join(available_move_ids)}\n"
+                    if available_switch_names:
+                        prompt += f"Available switches (use EXACT names): {', '.join(available_switch_names)}\n"
+                    prompt += "\nChoose ONLY from these exact options listed above!"
                 
                 logger.info(f"Making decision for battle {battle.battle_tag} (attempt {attempt + 1}/{max_retries + 1})", 
                            extra={'battle_id': battle.battle_tag, 'bot_name': self.username})
@@ -116,7 +129,11 @@ class LLMPlayer(Player):
                 
                 # If we get here, the action was invalid, try again
                 if attempt < max_retries:
-                    logger.warning(f"Invalid action on attempt {attempt + 1}, retrying...", 
+                    # Determine why it failed
+                    failure_reason = self._get_failure_reason(action, value, battle)
+                    failed_attempts.append((action, value, failure_reason))
+                    
+                    logger.warning(f"Invalid action on attempt {attempt + 1}: {failure_reason}", 
                                   extra={'battle_id': battle.battle_tag, 'bot_name': self.username})
                     
                     # Track the failed move
@@ -130,7 +147,7 @@ class LLMPlayer(Player):
                         execution_result="INVALID_ACTION",
                         battle_state_summary=self._get_battle_state_summary(battle),
                         success=False,
-                        error_message=f"Invalid action: {action}={value}"
+                        error_message=failure_reason
                     )
                     
                     continue
@@ -166,6 +183,43 @@ class LLMPlayer(Player):
                     logger.error(f"All retry attempts exhausted, using safe random move", 
                                 extra={'battle_id': battle.battle_tag, 'bot_name': self.username})
                     return self._choose_safe_random_move(battle)
+    
+    def _get_failure_reason(self, action: str, value: str, battle: Battle) -> str:
+        """
+        Determine why an action failed validation.
+        
+        Returns:
+            Human-readable reason for failure
+        """
+        if action == "move":
+            available_moves = [move.id for move in battle.available_moves] if battle.available_moves else []
+            if not available_moves:
+                return "No moves are available (might be trapped or struggling)"
+            elif value:
+                # Try to find similar moves
+                similar = [move for move in available_moves if value.lower() in move.lower() or move.lower() in value.lower()]
+                if similar:
+                    return f"Move '{value}' not found. Did you mean: {', '.join(similar)}?"
+                else:
+                    return f"Move '{value}' not available. Valid moves: {', '.join(available_moves)}"
+            else:
+                return "No move name provided"
+                
+        elif action == "switch":
+            available_switches = [pokemon.species for pokemon in battle.available_switches] if battle.available_switches else []
+            if not available_switches:
+                return "No switches available (might be trapped or only one Pokemon left)"
+            elif value:
+                # Try to find similar Pokemon names
+                similar = [poke for poke in available_switches if value.lower() in poke.lower() or poke.lower() in value.lower()]
+                if similar:
+                    return f"Pokemon '{value}' not found. Did you mean: {', '.join(similar)}?"
+                else:
+                    return f"Pokemon '{value}' not available. Valid switches: {', '.join(available_switches)}"
+            else:
+                return "No Pokemon name provided"
+        else:
+            return f"Invalid action type '{action}'. Must be 'move' or 'switch'"
     
     def _execute_validated_action(self, action: str, value: str, battle: Battle) -> Optional[str]:
         """

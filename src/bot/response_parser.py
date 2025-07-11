@@ -179,6 +179,13 @@ class ResponseParser:
         
         return variations
     
+    def _normalize_move_name(self, move_name: str) -> str:
+        """Normalize a move name for comparison."""
+        # Remove spaces, hyphens, underscores and convert to lowercase
+        normalized = move_name.lower()
+        normalized = normalized.replace(' ', '').replace('-', '').replace('_', '')
+        return normalized
+    
     def _validate_action(self, action: str, value: str, battle: Battle) -> Tuple[Optional[str], Optional[str]]:
         """
         Validate that the parsed action is legal in the current battle state.
@@ -195,9 +202,27 @@ class ResponseParser:
         if not battle.available_moves:
             return None, None
         
+        # Normalize the input value
+        normalized_input = self._normalize_move_name(move_value)
+        
         # Direct ID match
         for move in battle.available_moves:
             if move.id.lower() == move_value.lower():
+                return 'move', move.id
+        
+        # Normalized comparison
+        for move in battle.available_moves:
+            if self._normalize_move_name(move.id) == normalized_input:
+                return 'move', move.id
+        
+        # Partial match (input is contained in move name)
+        for move in battle.available_moves:
+            if normalized_input in self._normalize_move_name(move.id):
+                return 'move', move.id
+        
+        # Partial match (move name is contained in input)
+        for move in battle.available_moves:
+            if self._normalize_move_name(move.id) in normalized_input:
                 return 'move', move.id
         
         # Fuzzy match with variations

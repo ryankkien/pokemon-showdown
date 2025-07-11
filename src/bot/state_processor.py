@@ -262,18 +262,26 @@ class StateProcessor:
         
         # Available moves
         if battle.available_moves:
-            info += "Moves:\n"
+            info += "\nMOVES (use exact names in 'value' field):\n"
             for i, move in enumerate(battle.available_moves, 1):
                 move_info = self._get_move_info(move)
                 info += f"  {i}. {move_info}\n"
+                # Add the exact move ID to use
+                info += f"     → To use this move, set value: {move.id}\n"
+        else:
+            info += "\nNO MOVES AVAILABLE (might need to switch or struggle)\n"
         
         # Available switches
         if battle.available_switches:
-            info += "Switches:\n"
+            info += "\nSWITCHES (use exact names in 'value' field):\n"
             for i, pokemon in enumerate(battle.available_switches, 1):
                 hp_str = f"{int(pokemon.current_hp_fraction * 100)}%" if pokemon.current_hp_fraction is not None else "Unknown"
                 status_str = f" ({pokemon.status.name})" if pokemon.status else ""
                 info += f"  {i}. {pokemon.species} (HP: {hp_str}{status_str})\n"
+                # Add the exact Pokemon name to use
+                info += f"     → To switch to this Pokemon, set value: {pokemon.species}\n"
+        else:
+            info += "\nNO SWITCHES AVAILABLE (all other Pokemon fainted or trapped)\n"
         
         return info
     
@@ -438,11 +446,19 @@ Quick KO estimation:
         """Specify the expected response format."""
         return """
 **Instructions:**
-Based on the battle state above, choose the best action. Provide your response in this exact format:
+Based on the battle state above, choose the best action. You MUST use the EXACT move names and Pokemon names from the "Available Actions" section above.
+
+Provide your response in this EXACT format:
 
 action: "move" or "switch"
-value: "move_name" or "pokemon_name"
+value: "exact_move_name" or "exact_pokemon_name"
 reasoning: Brief explanation of your choice
+
+IMPORTANT RULES:
+1. Use the EXACT move name as shown in Available Actions (e.g., "flamethrower" not "Flamethrower" or "flame thrower")
+2. Use the EXACT Pokemon name as shown in Available Actions (e.g., "Pikachu" not "pikachu")
+3. Do NOT make up moves that aren't listed
+4. Do NOT try to use moves from Pokemon that aren't currently active
 
 Example responses:
 action: move
