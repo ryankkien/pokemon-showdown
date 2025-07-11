@@ -209,6 +209,10 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
                     matchmaker.update_battle_result(battle_result)
                     processed_battles.add(battle_result.battle_id)
                     print(f"Battle completed: {battle_result.bot1_username} vs {battle_result.bot2_username} - Winner: {battle_result.winner}")
+                    
+                    # Update leaderboard immediately after each battle
+                    leaderboard.update_from_matchmaker(matchmaker)
+                    print(f"Leaderboard updated - Total battles recorded: {len(leaderboard.battle_history)}")
             
             # Print stats periodically
             current_time = asyncio.get_event_loop().time()
