@@ -132,7 +132,42 @@ async def run_tournament(config_manager: BotVsBotConfigManager):
         await bot_manager.shutdown()
 
 
-async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None):
+async def _send_update_to_web_server(matchmaker, port: int = 5000):
+    """Send battle results to the web leaderboard server."""
+    try:
+        import aiohttp
+        from dataclasses import asdict
+        
+        # Prepare data to send
+        bot_stats = {
+            username: asdict(stats) for username, stats in matchmaker.bot_stats.items()
+        }
+        battle_results = [
+            asdict(result) for result in matchmaker.bot_manager.battle_results
+        ]
+        
+        data = {
+            "bot_stats": bot_stats,
+            "battle_results": battle_results
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"http://localhost:{port}/api/update",
+                json=data,
+                timeout=aiohttp.ClientTimeout(total=2)
+            ) as response:
+                if response.status == 200:
+                    print(f"✓ Sent update to web leaderboard server")
+                else:
+                    print(f"⚠ Web leaderboard server responded with status {response.status}")
+                    
+    except Exception as e:
+        # Don't fail if web server isn't running or update fails
+        print(f"Note: Could not update web leaderboard server (this is normal if server isn't running): {e}")
+
+
+async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None, leaderboard_port: int = 5000):
     """Run continuous matchmaking system."""
     global running, manager, matchmaker
     
@@ -213,6 +248,9 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
                     # Update leaderboard immediately after each battle
                     leaderboard.update_from_matchmaker(matchmaker)
                     print(f"Leaderboard updated - Total battles recorded: {len(leaderboard.battle_history)}")
+                    
+                    # Send data to web leaderboard server if it's running
+                    await _send_update_to_web_server(matchmaker, leaderboard_port)
             
             # Print stats periodically
             current_time = asyncio.get_event_loop().time()
@@ -427,7 +465,7 @@ async def main():
         elif args.mode == "tournament":
             await run_tournament(config_manager)
         elif args.mode == "continuous":
-            await run_continuous_matchmaking(config_manager, args.duration)
+            await run_continuous_matchmaking(config_manager, args.duration, args.leaderboard_port)
     
     except KeyboardInterrupt:
         print("\nShutdown requested by user")

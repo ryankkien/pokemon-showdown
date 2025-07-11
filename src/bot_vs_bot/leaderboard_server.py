@@ -671,9 +671,15 @@ def api_update():
         
         if 'battle_results' in data:
             for result_data in data['battle_results']:
-                result = BattleResult(**result_data)
-                if result not in leaderboard_manager.battle_history:
-                    leaderboard_manager.battle_history.append(result)
+                try:
+                    result = BattleResult(**result_data)
+                    # Check if this battle is already recorded
+                    existing_ids = {b.battle_id for b in leaderboard_manager.battle_history}
+                    if result.battle_id not in existing_ids:
+                        leaderboard_manager.battle_history.append(result)
+                except Exception as e:
+                    print(f"Error processing battle result: {e}")
+                    continue
         
         leaderboard_manager.save_data()
         return jsonify({'status': 'success'})
