@@ -18,8 +18,6 @@ from src.bot_vs_bot.battle_relay_server import start_relay_server, get_relay_ser
 from src.bot_vs_bot.bot_manager import BotManager
 from src.bot_vs_bot.bot_matchmaker import BotMatchmaker, MatchRequest
 from src.bot_vs_bot.bot_vs_bot_config import BotVsBotConfigManager
-from src.bot_vs_bot.bot_matchmaker import BotStats
-from src.bot_vs_bot.bot_manager import BattleResult
 from src.bot.play_format import SUPPORTED_RANDOM_BATTLE_FORMATS
 
 @dataclass 

@@ -13,7 +13,7 @@ import json
 import time
 
 from src.bot.bot import LLMPlayer
-from poke_env.ps_client.server_configuration import ServerConfiguration
+from poke_env.ps_client.server_configuration import ServerConfiguration, LocalhostServerConfiguration
 from poke_env.ps_client.account_configuration import AccountConfiguration
 from src.utils.battle_tracker import battle_tracker
 
@@ -73,10 +73,15 @@ class BotManager:
             server_url: Pokemon Showdown server URL
         """
         self.server_url = server_url
-        self.server_config = ServerConfiguration(
-            f'ws://{server_url.split("://")[1]}/showdown/websocket',
-            server_url
-        )
+        
+        # Use LocalhostServerConfiguration for local servers
+        if "localhost" in server_url or "127.0.0.1" in server_url:
+            self.server_config = LocalhostServerConfiguration
+        else:
+            self.server_config = ServerConfiguration(
+                f'ws://{server_url.split("://")[1]}/showdown/websocket',
+                server_url
+            )
         
         self.active_bots: Dict[str, LLMPlayer] = {}
         self.battle_results: List[BattleResult] = []
@@ -102,7 +107,11 @@ class BotManager:
                              if k not in ['description', 'model']}
             
             # Create account configuration for the username
-            account_config = AccountConfiguration(config.username, None)
+            # For localhost, we don't need authentication
+            if self.server_config == LocalhostServerConfiguration:
+                account_config = None
+            else:
+                account_config = AccountConfiguration(config.username, None)
             
             # Extract model from custom_config if it exists
             model = config.custom_config.get('model') if config.custom_config else None
