@@ -5,9 +5,17 @@
 echo "🚀 Starting Pokemon Showdown LLM Battle Arena..."
 echo ""
 
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Get the project root (parent of scripts directory)
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+# Change to project root
+cd "$PROJECT_ROOT"
+
 # Check if we're in the right directory
 if [ ! -f "src/bot_vs_bot/run_bot_vs_bot.py" ]; then
-    echo "Error: Please run this script from the pokemon-showdown root directory"
+    echo "Error: Cannot find bot_vs_bot files. Expected to be in: $PROJECT_ROOT"
     exit 1
 fi
 
@@ -17,7 +25,7 @@ if [ -d "server/pokemon-showdown" ]; then
     cd server/pokemon-showdown && node pokemon-showdown &
     SHOWDOWN_PID=$!
     echo "Showdown PID: $SHOWDOWN_PID"
-    cd ../..
+    cd "$PROJECT_ROOT"
     sleep 3
 else
     echo "⚠️  Local Pokemon Showdown not found in server/pokemon-showdown"
@@ -26,7 +34,7 @@ fi
 
 # Set Python path and start the backend with web server
 echo "📊 Starting backend server with web interface..."
-export PYTHONPATH=$(pwd):$PYTHONPATH
+export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 python3 src/bot_vs_bot/run_bot_vs_bot.py \
     --mode continuous \
     --leaderboard \
@@ -43,9 +51,20 @@ sleep 5
 # Start the React dev server
 echo ""
 echo "🌐 Starting React development server..."
-cd web && npm run dev &
-FRONTEND_PID=$!
-echo "Frontend PID: $FRONTEND_PID"
+if [ -d "$PROJECT_ROOT/web" ]; then
+    cd "$PROJECT_ROOT/web"
+    # Check if node_modules exists
+    if [ ! -d "node_modules" ]; then
+        echo "Installing web dependencies..."
+        npm install
+    fi
+    npm run dev &
+    FRONTEND_PID=$!
+    echo "Frontend PID: $FRONTEND_PID"
+else
+    echo "⚠️  Web directory not found at $PROJECT_ROOT/web"
+    echo "   Web interface will not be available"
+fi
 
 # Display URLs
 echo ""
