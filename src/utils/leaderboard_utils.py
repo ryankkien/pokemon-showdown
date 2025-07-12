@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-Quick fix to sync leaderboard with actual battle results
+Leaderboard utilities for Pokemon Showdown bot system.
+Includes functionality to sync and fix leaderboard data.
 """
 import json
-import sys
 from src.bot_vs_bot.bot_matchmaker import BotStats
 
-def fix_leaderboard_sync():
+
+def fix_leaderboard_sync(leaderboard_file='leaderboard_data.json'):
     """Recalculate stats from battle history"""
     
     # Load current data
-    with open('leaderboard_data.json', 'r') as f:
+    with open(leaderboard_file, 'r') as f:
         data = json.load(f)
     
     print("Fixing leaderboard sync...")
@@ -96,7 +97,7 @@ def fix_leaderboard_sync():
     data['bot_stats'] = bot_stats
     
     # Save back
-    with open('leaderboard_data.json', 'w') as f:
+    with open(leaderboard_file, 'w') as f:
         json.dump(data, f, indent=2)
     
     print("\nFixed stats:")
@@ -105,7 +106,13 @@ def fix_leaderboard_sync():
             print(f"{username}: {stats['wins']}-{stats['losses']}-{stats['draws']} "
                   f"(ELO: {stats['elo_rating']}, WR: {stats['win_rate']*100:.1f}%)")
 
-if __name__ == "__main__":
+
+def main():
+    """Command line interface for leaderboard utilities."""
     fix_leaderboard_sync()
     print("\nLeaderboard data has been fixed!")
     print("The web leaderboard should now show correct stats.")
+
+
+if __name__ == "__main__":
+    main()
