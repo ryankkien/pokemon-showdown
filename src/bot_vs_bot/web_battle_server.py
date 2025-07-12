@@ -314,9 +314,11 @@ class WebBattleServer:
             
             print(f"Starting battle: {bot1_config.username} vs {bot2_config.username}")
             
-            # Create bots
-            await self.bot_manager.create_bot(bot1_config)
-            await self.bot_manager.create_bot(bot2_config)
+            # Create bots only if they don't exist
+            if bot1_config.username not in self.bot_manager.active_bots:
+                await self.bot_manager.create_bot(bot1_config)
+            if bot2_config.username not in self.bot_manager.active_bots:
+                await self.bot_manager.create_bot(bot2_config)
             
             # Start battle
             battle_id = await self.bot_manager.start_bot_battle(

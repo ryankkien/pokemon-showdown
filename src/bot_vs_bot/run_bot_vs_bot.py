@@ -366,7 +366,7 @@ async def main():
     
     # Setup argument parser
     parser = argparse.ArgumentParser(description="Run Pokemon Showdown bot vs bot battles")
-    parser.add_argument("--mode", choices=["single", "tournament", "continuous"], 
+    parser.add_argument("--mode", choices=["single", "tournament", "continuous", "web"], 
                        default="single", help="Battle mode to run")
     parser.add_argument("--config", default="bot_vs_bot_config.json", 
                        help="Configuration file path")
@@ -507,6 +507,12 @@ async def main():
             await run_tournament(config_manager)
         elif args.mode == "continuous":
             await run_continuous_matchmaking(config_manager, args.duration, args.leaderboard_port)
+        elif args.mode == "web":
+            # Web mode - just keep the process alive for the web server
+            print("Running in web-only mode. Use the web interface to start battles.")
+            # Keep the main thread alive
+            while True:
+                await asyncio.sleep(60)
     
     except KeyboardInterrupt:
         print("\nShutdown requested by user")

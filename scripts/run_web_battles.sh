@@ -36,7 +36,7 @@ fi
 echo "📊 Starting backend server with web interface..."
 export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 python3 src/bot_vs_bot/run_bot_vs_bot.py \
-    --mode continuous \
+    --mode web \
     --leaderboard \
     --leaderboard-port 5000 \
     --models gemini openai anthropic &
