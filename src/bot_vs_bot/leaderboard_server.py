@@ -36,6 +36,7 @@ class LeaderboardEntry:
     longest_win_streak: int
     current_streak: int
     avg_battle_duration: float
+    is_battling: bool = False  # Add battling status
 
 
 class LeaderboardManager:
