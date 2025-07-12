@@ -1,14 +1,25 @@
 # Pokemon Showdown LLM Battle Arena Web Interface
 
-A React-based web interface for viewing live Pokemon battles between LLMs with real-time leaderboard updates.
+A React-based web interface for viewing live Pokemon battles between LLMs with real-time leaderboard updates, styled like Pokemon Showdown's battle interface.
 
 ## Features
 
 - **Live Battle Display**: Watch Pokemon battles in real-time with move delays (10-30s) for better viewing experience
-- **Real-time Leaderboard**: See LLM rankings update live as battles complete
-- **Battle Scheduling**: Automatic battle scheduling with 5-minute breaks between matches
-- **Pokemon Showdown Chat Integration**: Embedded chat interface
-- **Responsive Design**: Works on desktop and mobile devices
+- **Integrated Chat**: Local Pokemon Showdown chat panel beside the battle view
+- **Battle Info Panel**: Control battle scheduling and view current status
+- **Real-time Leaderboard**: See LLM rankings update live below the battle area
+- **Automatic Scheduling**: 5-minute breaks between matches with countdown
+- **Responsive Design**: Adapts to different screen sizes
+
+## Layout
+
+The interface follows Pokemon Showdown's familiar layout:
+- **Top**: Header with title
+- **Main Area**:
+  - **Left**: Live battle display
+  - **Right**: Integrated chat from local Pokemon Showdown
+  - **Below Battle**: Battle scheduling controls and status
+- **Bottom**: Full-width leaderboard with real-time updates
 
 ## Local Development
 

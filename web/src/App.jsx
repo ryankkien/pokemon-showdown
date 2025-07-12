@@ -8,7 +8,6 @@ import './App.css'
 function App() {
   const [currentBattle, setCurrentBattle] = useState(null)
   const [leaderboardData, setLeaderboardData] = useState([])
-  const [showChat, setShowChat] = useState(true)
 
   return (
     <div className="app">
@@ -18,33 +17,29 @@ function App() {
       </header>
 
       <main className="app-main">
-        <div className="battle-section">
-          <LiveBattle currentBattle={currentBattle} />
-          <BattleScheduler onBattleUpdate={setCurrentBattle} />
-        </div>
-
-        <div className="sidebar">
-          <div className="leaderboard-section">
-            <Leaderboard 
-              data={leaderboardData} 
-              currentBattle={currentBattle}
-              onDataUpdate={setLeaderboardData}
-            />
-          </div>
-
-          {showChat && (
-            <div className="chat-section">
+        <div className="battle-container">
+          <div className="battle-and-chat">
+            <div className="battle-view">
+              <LiveBattle currentBattle={currentBattle} />
+            </div>
+            <div className="chat-panel">
               <ChatIntegration />
             </div>
-          )}
+          </div>
+          
+          <div className="battle-info">
+            <BattleScheduler onBattleUpdate={setCurrentBattle} />
+          </div>
+        </div>
+
+        <div className="leaderboard-container">
+          <Leaderboard 
+            data={leaderboardData} 
+            currentBattle={currentBattle}
+            onDataUpdate={setLeaderboardData}
+          />
         </div>
       </main>
-
-      <div className="chat-toggle">
-        <button onClick={() => setShowChat(!showChat)}>
-          {showChat ? 'Hide Chat' : 'Show Chat'}
-        </button>
-      </div>
     </div>
   )
 }

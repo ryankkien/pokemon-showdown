@@ -2,25 +2,26 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #0c0a09;
 }
 
 .app-header {
   background: #18181b;
   border-bottom: 1px solid #27272a;
-  padding: 24px;
+  padding: 20px 24px;
   text-align: center;
 }
 
 .app-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #fafaf9;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   letter-spacing: -0.025em;
 }
 
 .app-header p {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: #a1a1aa;
   font-weight: 500;
 }
@@ -28,85 +29,68 @@
 .app-main {
   flex: 1;
   display: flex;
-  gap: 24px;
+  flex-direction: column;
   padding: 24px;
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  gap: 24px;
 }
 
-.battle-section {
-  flex: 1;
+.battle-container {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.sidebar {
-  width: 400px;
+.battle-and-chat {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  height: 600px;
 }
 
-.leaderboard-section {
+.battle-view {
   flex: 1;
+  min-width: 0;
+}
+
+.chat-panel {
+  width: 350px;
+  flex-shrink: 0;
+}
+
+.battle-info {
+  width: 100%;
+}
+
+.leaderboard-container {
+  width: 100%;
   min-height: 400px;
 }
 
-.chat-section {
-  height: 400px;
-}
-
-.chat-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 100;
-}
-
-.chat-toggle button {
-  padding: 12px 24px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.chat-toggle button:hover {
-  background: #1d4ed8;
-}
-
+/* Responsive design */
 @media (max-width: 1200px) {
-  .app-main {
+  .battle-and-chat {
     flex-direction: column;
+    height: auto;
   }
   
-  .sidebar {
+  .chat-panel {
     width: 100%;
-    flex-direction: row;
-  }
-  
-  .leaderboard-section,
-  .chat-section {
-    flex: 1;
+    height: 300px;
   }
 }
 
 @media (max-width: 768px) {
   .app-header h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
   
-  .sidebar {
-    flex-direction: column;
+  .app-header p {
+    font-size: 0.875rem;
   }
   
-  .chat-section {
-    height: 300px;
+  .app-main {
+    padding: 16px;
   }
 }
