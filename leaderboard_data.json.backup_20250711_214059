@@ -1,0 +1,879 @@
+{
+  "bot_stats": {
+    "GeminiBot": {
+      "username": "GeminiBot",
+      "elo_rating": 1200,
+      "wins": 0,
+      "losses": 0,
+      "draws": 1,
+      "total_battles": 1,
+      "win_rate": 0.0,
+      "last_battle_time": 0,
+      "longest_win_streak": 0,
+      "current_win_streak": 0,
+      "battle_formats": {}
+    },
+    "OpenAIBot": {
+      "username": "OpenAIBot",
+      "elo_rating": 1200,
+      "wins": 0,
+      "losses": 0,
+      "draws": 1,
+      "total_battles": 1,
+      "win_rate": 0.0,
+      "last_battle_time": 0,
+      "longest_win_streak": 0,
+      "current_win_streak": 0,
+      "battle_formats": {}
+    },
+    "AnthropicBot": {
+      "username": "AnthropicBot",
+      "elo_rating": 1200,
+      "wins": 0,
+      "losses": 0,
+      "draws": 1,
+      "total_battles": 1,
+      "win_rate": 0.0,
+      "last_battle_time": 0,
+      "longest_win_streak": 0,
+      "current_win_streak": 0,
+      "battle_formats": {}
+    },
+    "OllamaBot": {
+      "username": "OllamaBot",
+      "elo_rating": 1200,
+      "wins": 0,
+      "losses": 0,
+      "draws": 1,
+      "total_battles": 1,
+      "win_rate": 0.0,
+      "last_battle_time": 0,
+      "longest_win_streak": 0,
+      "current_win_streak": 0,
+      "battle_formats": {}
+    },
+    "Gemini-1.5-Flash": {
+      "username": "Gemini-1.5-Flash",
+      "elo_rating": 1230,
+      "wins": 5,
+      "losses": 2,
+      "draws": 1,
+      "total_battles": 8,
+      "win_rate": 0.625,
+      "last_battle_time": 0,
+      "longest_win_streak": 5,
+      "current_win_streak": 5,
+      "battle_formats": {}
+    },
+    "Gemini-1.5-Pro": {
+      "username": "Gemini-1.5-Pro",
+      "elo_rating": 1170,
+      "wins": 2,
+      "losses": 5,
+      "draws": 1,
+      "total_battles": 8,
+      "win_rate": 0.25,
+      "last_battle_time": 0,
+      "longest_win_streak": 1,
+      "current_win_streak": 0,
+      "battle_formats": {}
+    },
+    "Gemini-1.5-Pro-002": {
+      "username": "Gemini-1.5-Pro-002",
+      "elo_rating": 1180,
+      "wins": 0,
+      "losses": 2,
+      "draws": 0,
+      "total_battles": 2,
+      "win_rate": 0.0,
+      "last_battle_time": 0,
+      "longest_win_streak": 0,
+      "current_win_streak": 0,
+      "battle_formats": {}
+    },
+    "Gemini-2.0-Flash": {
+      "username": "Gemini-2.0-Flash",
+      "elo_rating": 1204.2762827462745,
+      "wins": 2,
+      "losses": 1,
+      "draws": 0,
+      "total_battles": 3,
+      "win_rate": 0.6666666666666666,
+      "last_battle_time": 1752295091.037986,
+      "longest_win_streak": 2,
+      "current_win_streak": 0,
+      "battle_formats": {
+        "gen9randombattle": 1
+      }
+    },
+    "GPT-4o": {
+      "username": "GPT-4o",
+      "elo_rating": 1186.0,
+      "wins": 3,
+      "losses": 5,
+      "draws": 0,
+      "total_battles": 8,
+      "win_rate": 0.375,
+      "last_battle_time": 1752294968.2359412,
+      "longest_win_streak": 2,
+      "current_win_streak": 2,
+      "battle_formats": {
+        "gen9randombattle": 1
+      }
+    },
+    "GPT-4o-mini": {
+      "username": "GPT-4o-mini",
+      "elo_rating": 1246.0,
+      "wins": 6,
+      "losses": 2,
+      "draws": 0,
+      "total_battles": 8,
+      "win_rate": 0.75,
+      "last_battle_time": 1752295028.863738,
+      "longest_win_streak": 3,
+      "current_win_streak": 1,
+      "battle_formats": {
+        "gen9randombattle": 1
+      }
+    },
+    "Claude-3-Opus": {
+      "username": "Claude-3-Opus",
+      "elo_rating": 1191.3727654351187,
+      "wins": 6,
+      "losses": 7,
+      "draws": 0,
+      "total_battles": 13,
+      "win_rate": 0.46153846153846156,
+      "last_battle_time": 1752295062.5438678,
+      "longest_win_streak": 3,
+      "current_win_streak": 1,
+      "battle_formats": {
+        "gen9randombattle": 2
+      }
+    },
+    "Claude-3-Sonnet": {
+      "username": "Claude-3-Sonnet",
+      "elo_rating": 1194.736306793522,
+      "wins": 6,
+      "losses": 6,
+      "draws": 0,
+      "total_battles": 12,
+      "win_rate": 0.5,
+      "last_battle_time": 1752294980.394382,
+      "longest_win_streak": 3,
+      "current_win_streak": 0,
+      "battle_formats": {
+        "gen9randombattle": 1
+      }
+    },
+    "Claude-3.5-Sonnet": {
+      "username": "Claude-3.5-Sonnet",
+      "elo_rating": 1188.5641271217237,
+      "wins": 2,
+      "losses": 3,
+      "draws": 5,
+      "total_battles": 10,
+      "win_rate": 0.2,
+      "last_battle_time": 1752295062.5438678,
+      "longest_win_streak": 1,
+      "current_win_streak": 0,
+      "battle_formats": {
+        "gen9randombattle": 2
+      }
+    },
+    "Claude-3.5-Haiku": {
+      "username": "Claude-3.5-Haiku",
+      "elo_rating": 1241.0008875160204,
+      "wins": 4,
+      "losses": 1,
+      "draws": 5,
+      "total_battles": 10,
+      "win_rate": 0.4,
+      "last_battle_time": 1752295091.037986,
+      "longest_win_streak": 3,
+      "current_win_streak": 3,
+      "battle_formats": {
+        "gen9randombattle": 2
+      }
+    },
+    "GPT-4-Turbo": {
+      "username": "GPT-4-Turbo",
+      "elo_rating": 1154.736306793522,
+      "wins": 3,
+      "losses": 7,
+      "draws": 0,
+      "total_battles": 10,
+      "win_rate": 0.3,
+      "last_battle_time": 1752294968.2359412,
+      "longest_win_streak": 2,
+      "current_win_streak": 0,
+      "battle_formats": {
+        "gen9randombattle": 1
+      }
+    },
+    "GPT-3.5-Turbo": {
+      "username": "GPT-3.5-Turbo",
+      "elo_rating": 1214.736306793522,
+      "wins": 6,
+      "losses": 4,
+      "draws": 0,
+      "total_battles": 10,
+      "win_rate": 0.6,
+      "last_battle_time": 1752295028.863738,
+      "longest_win_streak": 5,
+      "current_win_streak": 0,
+      "battle_formats": {
+        "gen9randombattle": 1
+      }
+    },
+    "TestBot1": {
+      "username": "TestBot1",
+      "elo_rating": 1260.0,
+      "wins": 4,
+      "losses": 1,
+      "draws": 0,
+      "total_battles": 5,
+      "win_rate": 0.8,
+      "last_battle_time": 1752294354,
+      "longest_win_streak": 4,
+      "current_win_streak": 3,
+      "battle_formats": {
+        "gen9randombattle": 5
+      }
+    },
+    "TestBot2": {
+      "username": "TestBot2",
+      "elo_rating": 1190.0,
+      "wins": 1,
+      "losses": 4,
+      "draws": 0,
+      "total_battles": 5,
+      "win_rate": 0.2,
+      "last_battle_time": 1752294354,
+      "longest_win_streak": 1,
+      "current_win_streak": 0,
+      "battle_formats": {
+        "gen9randombattle": 5
+      }
+    }
+  },
+  "battle_history": [
+    {
+      "battle_id": "0bbf6c02",
+      "bot1_username": "GeminiBot",
+      "bot2_username": "OpenAIBot",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.5106658935546875,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1751185098.133583
+    },
+    {
+      "battle_id": "00f9225a",
+      "bot1_username": "AnthropicBot",
+      "bot2_username": "OllamaBot",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.9303371906280518,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1751185099.0640051
+    },
+    {
+      "battle_id": "c73eae6a",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Pro",
+      "battle_format": "gen9randombattle",
+      "duration": 6.082315921783447,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185086.489384
+    },
+    {
+      "battle_id": "1dc87a35",
+      "bot1_username": "Gemini-1.5-Pro-002",
+      "bot2_username": "Gemini-2.0-Flash",
+      "winner": "Gemini-2.0-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 18.864530086517334,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185105.35532
+    },
+    {
+      "battle_id": "47703682",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.508613109588623,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185120.8662882
+    },
+    {
+      "battle_id": "dcadd996",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Pro",
+      "battle_format": "gen9randombattle",
+      "duration": 15.959309101104736,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185317.457474
+    },
+    {
+      "battle_id": "5801deeb",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "duration": 5.428809881210327,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185322.8875232
+    },
+    {
+      "battle_id": "fba7bfeb",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Opus",
+      "battle_format": "gen9randombattle",
+      "duration": 8.07785677909851,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185330.966914
+    },
+    {
+      "battle_id": "3e04033c",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 11.150301933288574,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185461.7491782
+    },
+    {
+      "battle_id": "fe696836",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "duration": 15.7933828830719,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185477.544529
+    },
+    {
+      "battle_id": "bdcf9f9f",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 10.241514921188354,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185487.7873988
+    },
+    {
+      "battle_id": "c48b240d",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.5112369060516357,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185503.3015308
+    },
+    {
+      "battle_id": "bf9c90a7",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 3.6522257328033447,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185506.955534
+    },
+    {
+      "battle_id": "e8dec618",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-4-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 3.7247021198272705,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185510.681165
+    },
+    {
+      "battle_id": "c6b2129e",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 9.724491119384766,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185535.407757
+    },
+    {
+      "battle_id": "d162688d",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o",
+      "battle_format": "gen9randombattle",
+      "duration": 5.17133092880249,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185540.580412
+    },
+    {
+      "battle_id": "2c89bf58",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.5102570056915283,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185541.091916
+    },
+    {
+      "battle_id": "8907adc1",
+      "bot1_username": "Gemini-1.5-Pro-002",
+      "bot2_username": "Gemini-2.0-Flash",
+      "winner": "Gemini-2.0-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 27.108259916305542,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185583.20324
+    },
+    {
+      "battle_id": "5ed26fab",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 6.667927026748657,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185589.872181
+    },
+    {
+      "battle_id": "9bbdb3be",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-4-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 3.924031972885132,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185593.796849
+    },
+    {
+      "battle_id": "a95fdb4c",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Opus",
+      "battle_format": "gen9randombattle",
+      "duration": 8.458828926086426,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185617.258243
+    },
+    {
+      "battle_id": "285c04ee",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "duration": 5.2326061725616455,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185622.4920802
+    },
+    {
+      "battle_id": "e15281c1",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 4.792587995529175,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185627.286593
+    },
+    {
+      "battle_id": "51068188",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Opus",
+      "battle_format": "gen9randombattle",
+      "duration": 8.880002975463867,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185651.169376
+    },
+    {
+      "battle_id": "0235474d",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.5108110904693604,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185651.681598
+    },
+    {
+      "battle_id": "49f25f03",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 6.031949043273926,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185657.716577
+    },
+    {
+      "battle_id": "837b323a",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.5091269016265869,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185673.227846
+    },
+    {
+      "battle_id": "d08d5178",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Opus",
+      "battle_format": "gen9randombattle",
+      "duration": 6.726704835891724,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185679.9558558
+    },
+    {
+      "battle_id": "6d0ea87e",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 6.291108846664429,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185686.2478578
+    },
+    {
+      "battle_id": "c0713d15",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "duration": 8.306001901626587,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185709.5565162
+    },
+    {
+      "battle_id": "e701827a",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 8.535001039505005,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185718.092746
+    },
+    {
+      "battle_id": "bd6f1455",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": null,
+      "battle_format": "gen9randombattle",
+      "duration": 0.505608320236206,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752185718.599657
+    },
+    {
+      "battle_id": "e300cb5c",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 86.7806990146637,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190238.3890839
+    },
+    {
+      "battle_id": "74feda20",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "duration": 11.358956813812256,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190249.74914
+    },
+    {
+      "battle_id": "c2e2b95c",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Opus",
+      "battle_format": "gen9randombattle",
+      "duration": 6.1138176918029785,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190255.866831
+    },
+    {
+      "battle_id": "5d7aa31a",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": "Claude-3.5-Haiku",
+      "battle_format": "gen9randombattle",
+      "duration": 9.269652366638184,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190280.139848
+    },
+    {
+      "battle_id": "f46a13a2",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 7.478517055511475,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190287.619595
+    },
+    {
+      "battle_id": "423cca50",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 6.423906087875366,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190294.044964
+    },
+    {
+      "battle_id": "16f7e50a",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 8.146075963973999,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190317.193633
+    },
+    {
+      "battle_id": "af101ddf",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4o-mini",
+      "winner": "GPT-4o",
+      "battle_format": "gen9randombattle",
+      "duration": 5.5611817836761475,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190322.756059
+    },
+    {
+      "battle_id": "8a091650",
+      "bot1_username": "Gemini-1.5-Flash",
+      "bot2_username": "Gemini-1.5-Pro",
+      "winner": "Gemini-1.5-Flash",
+      "battle_format": "gen9randombattle",
+      "duration": 0.5040168762207031,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190323.2613099
+    },
+    {
+      "battle_id": "7f698739",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 9.60141372680664,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190347.8641431
+    },
+    {
+      "battle_id": "982176f2",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": "Claude-3.5-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 5.692230224609375,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190353.557688
+    },
+    {
+      "battle_id": "75cefc36",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-3.5-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 6.435413837432861,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190359.994484
+    },
+    {
+      "battle_id": "99e86ae9",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": "Claude-3.5-Haiku",
+      "battle_format": "gen9randombattle",
+      "duration": 5.761768817901611,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190380.758624
+    },
+    {
+      "battle_id": "d8a33422",
+      "bot1_username": "Claude-3-Opus",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 6.345628261566162,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190387.104919
+    },
+    {
+      "battle_id": "830e6760",
+      "bot1_username": "GPT-4-Turbo",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-4-Turbo",
+      "battle_format": "gen9randombattle",
+      "duration": 11.909312963485718,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752190399.0154119
+    },
+    {
+      "battle_id": "test123",
+      "bot1_username": "TestBot1",
+      "bot2_username": "TestBot2",
+      "winner": "TestBot1",
+      "battle_format": "gen9randombattle",
+      "duration": 45.5,
+      "turns": 12,
+      "battle_log": null,
+      "timestamp": 1752193403.724439
+    },
+    {
+      "battle_id": "test_update_1752294327",
+      "bot1_username": "TestBot1",
+      "bot2_username": "TestBot2",
+      "winner": "TestBot1",
+      "battle_format": "gen9randombattle",
+      "duration": 45.5,
+      "turns": 12,
+      "battle_log": null,
+      "timestamp": 1752294327
+    },
+    {
+      "battle_id": "test_battle_2_1752294354",
+      "bot1_username": "TestBot1",
+      "bot2_username": "TestBot2",
+      "winner": "TestBot1",
+      "battle_format": "gen9randombattle",
+      "duration": 52.3,
+      "turns": 15,
+      "battle_log": null,
+      "timestamp": 1752294354
+    },
+    {
+      "battle_id": "5a92cc1b",
+      "bot1_username": "GPT-4o",
+      "bot2_username": "GPT-4-Turbo",
+      "winner": "GPT-4o",
+      "battle_format": "gen9randombattle",
+      "duration": 140.77794671058655,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752294968.2359412
+    },
+    {
+      "battle_id": "560f1674",
+      "bot1_username": "Claude-3.5-Haiku",
+      "bot2_username": "Claude-3-Sonnet",
+      "winner": "Claude-3.5-Haiku",
+      "battle_format": "gen9randombattle",
+      "duration": 12.15714406967163,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752294980.394382
+    },
+    {
+      "battle_id": "7532d522",
+      "bot1_username": "GPT-4o-mini",
+      "bot2_username": "GPT-3.5-Turbo",
+      "winner": "GPT-4o-mini",
+      "battle_format": "gen9randombattle",
+      "duration": 48.46809124946594,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752295028.863738
+    },
+    {
+      "battle_id": "65728c33",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3-Opus",
+      "winner": "Claude-3.5-Sonnet",
+      "battle_format": "gen9randombattle",
+      "duration": 12.362468957901001,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752295056.228064
+    },
+    {
+      "battle_id": "a0fd49a4",
+      "bot1_username": "Claude-3.5-Sonnet",
+      "bot2_username": "Claude-3-Opus",
+      "winner": "Claude-3-Opus",
+      "battle_format": "gen9randombattle",
+      "duration": 6.313982963562012,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752295062.5438678
+    },
+    {
+      "battle_id": "1920c2c1",
+      "bot1_username": "Gemini-2.0-Flash",
+      "bot2_username": "Claude-3.5-Haiku",
+      "winner": "Claude-3.5-Haiku",
+      "battle_format": "gen9randombattle",
+      "duration": 28.492965936660767,
+      "turns": 0,
+      "battle_log": null,
+      "timestamp": 1752295091.037986
+    }
+  ],
+  "last_updated": "2025-07-11T21:38:26.042513"
+}

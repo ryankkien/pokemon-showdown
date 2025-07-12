@@ -44,6 +44,12 @@ def main():
     test_parser = subparsers.add_parser('test', help='Run all tests')
     test_parser.set_defaults(func=run_tests)
     
+    # Cleanup leaderboard command
+    cleanup_parser = subparsers.add_parser('cleanup-leaderboard', help='Remove test bots and invalid entries from leaderboard')
+    cleanup_parser.add_argument('--dry-run', action='store_true', help='Show what would be removed without actually doing it')
+    cleanup_parser.add_argument('--no-backup', action='store_true', help='Skip creating backup')
+    cleanup_parser.set_defaults(func=cleanup_leaderboard)
+    
     args = parser.parse_args()
     
     if not hasattr(args, 'func'):
@@ -94,6 +100,12 @@ def run_tests():
     """Run all tests."""
     from tests.test_all import main
     return asyncio.run(main())
+
+
+def cleanup_leaderboard():
+    """Remove test bots and invalid entries from leaderboard."""
+    from src.utils.cleanup_leaderboard import main
+    return main()
 
 
 if __name__ == "__main__":
