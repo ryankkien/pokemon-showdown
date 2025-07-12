@@ -10,6 +10,7 @@
   border-bottom: 1px solid #27272a;
   padding: 20px 24px;
   text-align: center;
+  position: relative;
 }
 
 .app-header h1 {
@@ -26,58 +27,114 @@
   font-weight: 500;
 }
 
+.view-mode-toggle {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.view-mode-toggle button {
+  padding: 0.5rem 1rem;
+  background: #27272a;
+  color: #a1a1aa;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-mode-toggle button:hover {
+  background: #3f3f46;
+  color: #fafaf9;
+}
+
+.view-mode-toggle button.active {
+  background: #4CAF50;
+  color: #fafaf9;
+  border-color: #4CAF50;
+}
+
 .app-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 24px;
-  max-width: 1600px;
-  margin: 0 auto;
-  width: 100%;
-  gap: 24px;
+  overflow: hidden;
 }
 
-.battle-container {
+.main-content {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  height: calc(100vh - 150px);
+}
+
+.left-panel {
+  width: 320px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 
-.battle-and-chat {
-  display: flex;
-  gap: 16px;
-  height: 600px;
-}
-
-.battle-view {
-  flex: 1;
-  min-width: 0;
-}
-
-.chat-panel {
-  width: 350px;
+.battle-scheduler-section {
   flex-shrink: 0;
 }
 
-.battle-info {
+.leaderboard-section {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.center-panel {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.right-panel {
+  width: 320px;
+  overflow: hidden;
+}
+
+/* View modes */
+.split-view {
+  display: flex;
+  gap: 16px;
   width: 100%;
 }
 
-.leaderboard-container {
+.custom-battle-view,
+.showdown-battle-view {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.full-custom-view,
+.full-showdown-view {
   width: 100%;
-  min-height: 400px;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Responsive design */
-@media (max-width: 1200px) {
-  .battle-and-chat {
+@media (max-width: 1400px) {
+  .main-content {
     flex-direction: column;
     height: auto;
   }
   
-  .chat-panel {
+  .left-panel,
+  .right-panel {
     width: 100%;
-    height: 300px;
+    max-height: 300px;
+  }
+  
+  .center-panel {
+    min-height: 600px;
   }
 }
 
@@ -90,7 +147,16 @@
     font-size: 0.875rem;
   }
   
-  .app-main {
-    padding: 16px;
+  .view-mode-toggle {
+    flex-wrap: wrap;
+  }
+  
+  .main-content {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .split-view {
+    flex-direction: column;
   }
 }

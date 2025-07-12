@@ -1,0 +1,139 @@
+.showdown-battle-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.showdown-header {
+  padding: 1rem;
+  background: #2a2a2a;
+  border-bottom: 1px solid #444;
+}
+
+.showdown-header h3 {
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.battle-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.battle-id {
+  color: #4CAF50;
+}
+
+.battle-players {
+  color: #FFC107;
+}
+
+.no-battle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  text-align: center;
+  color: #888;
+}
+
+.no-battle h3 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #444;
+  border-top-color: #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  color: #fff;
+  margin-top: 1rem;
+}
+
+.showdown-iframe-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 600px;
+}
+
+.showdown-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.showdown-controls {
+  padding: 1rem;
+  background: #2a2a2a;
+  border-top: 1px solid #444;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.showdown-controls button {
+  padding: 0.5rem 1rem;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.showdown-controls button:hover {
+  background: #444;
+  border-color: #666;
+}
+
+.open-external {
+  background: #2196F3 !important;
+  border-color: #1976D2 !important;
+}
+
+.open-external:hover {
+  background: #1976D2 !important;
+}
+
+.refresh-battle {
+  background: #4CAF50 !important;
+  border-color: #388E3C !important;
+}
+
+.refresh-battle:hover {
+  background: #388E3C !important;
+}
