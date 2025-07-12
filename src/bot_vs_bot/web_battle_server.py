@@ -60,10 +60,25 @@ class WebBattleServer:
     def _setup_routes(self):
         """Setup all HTTP routes."""
         
-        # Serve main page
+        # Serve main page - redirect to React app
         @self.app.route('/')
         def index():
-            return render_template_string(LEADERBOARD_HTML)
+            return '''
+            <html>
+            <head><title>Pokemon Showdown LLM Battle Arena</title></head>
+            <body>
+                <h1>Pokemon Showdown LLM Battle Arena</h1>
+                <p>This is the API server running on port 5000.</p>
+                <p><strong>Please visit the web interface at: <a href="http://localhost:3000">http://localhost:3000</a></strong></p>
+                <p>Services:</p>
+                <ul>
+                    <li>Web Interface: <a href="http://localhost:3000">http://localhost:3000</a></li>
+                    <li>API Server: <a href="http://localhost:5000/api/leaderboard">http://localhost:5000/api/leaderboard</a></li>
+                    <li>Pokemon Showdown: <a href="http://localhost:8000">http://localhost:8000</a></li>
+                </ul>
+            </body>
+            </html>
+            '''
         
         # Leaderboard endpoints
         @self.app.route('/api/leaderboard')
@@ -313,12 +328,22 @@ class WebBattleServer:
                 )
             
             print(f"Starting battle: {bot1_config.username} vs {bot2_config.username}")
+            print(f"Active bots before creation: {list(self.bot_manager.active_bots.keys())}")
             
             # Create bots only if they don't exist
             if bot1_config.username not in self.bot_manager.active_bots:
+                print(f"Creating bot: {bot1_config.username}")
                 await self.bot_manager.create_bot(bot1_config)
+            else:
+                print(f"Bot {bot1_config.username} already exists")
+                
             if bot2_config.username not in self.bot_manager.active_bots:
+                print(f"Creating bot: {bot2_config.username}")
                 await self.bot_manager.create_bot(bot2_config)
+            else:
+                print(f"Bot {bot2_config.username} already exists")
+                
+            print(f"Active bots after creation: {list(self.bot_manager.active_bots.keys())}")
             
             # Start battle
             battle_id = await self.bot_manager.start_bot_battle(
@@ -365,6 +390,8 @@ class WebBattleServer:
             
         except Exception as e:
             print(f"Error in battle: {e}")
+            import traceback
+            traceback.print_exc()
             raise
         finally:
             self.current_battle = None
