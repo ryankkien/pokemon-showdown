@@ -135,42 +135,57 @@ async def run_tournament(config_manager: BotVsBotConfigManager):
         await bot_manager.shutdown()
 
 
-async def _send_update_to_web_server(matchmaker, port: int = 5000):
-    """Send battle results to the web leaderboard server."""
-    try:
-        import aiohttp
-        from dataclasses import asdict
-        
-        # Prepare data to send
-        bot_stats = {
-            username: asdict(stats) for username, stats in matchmaker.bot_stats.items()
-        }
-        battle_results = [
-            asdict(result) for result in matchmaker.bot_manager.battle_results
-        ]
-        
-        data = {
-            "bot_stats": bot_stats,
-            "battle_results": battle_results
-        }
-        
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"http://localhost:{port}/api/update",
-                json=data,
-                timeout=aiohttp.ClientTimeout(total=2)
-            ) as response:
-                if response.status == 200:
-                    print(f"✓ Sent update to web leaderboard server")
-                else:
-                    print(f"⚠ Web leaderboard server responded with status {response.status}")
-                    
-    except Exception as e:
-        # Don't fail if web server isn't running or update fails
-        print(f"Note: Could not update web leaderboard server (this is normal if server isn't running): {e}")
+async def _send_update_to_web_server(matchmaker, port: int = 5001, max_retries: int = 2):
+    """Send battle results to the web leaderboard server with retry logic."""
+    for attempt in range(max_retries + 1):
+        try:
+            import aiohttp
+            from dataclasses import asdict
+            
+            # Prepare data to send
+            bot_stats = {
+                username: asdict(stats) for username, stats in matchmaker.bot_stats.items()
+            }
+            battle_results = [
+                asdict(result) for result in matchmaker.bot_manager.battle_results
+            ]
+            
+            data = {
+                "bot_stats": bot_stats,
+                "battle_results": battle_results,
+                "timestamp": datetime.now().isoformat(),
+                "total_battles": len(battle_results)
+            }
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    f"http://localhost:{port}/api/update",
+                    json=data,
+                    timeout=aiohttp.ClientTimeout(total=3)
+                ) as response:
+                    if response.status == 200:
+                        print(f"✓ Real-time update sent to web leaderboard (Battle #{len(battle_results)})")
+                        return True
+                    else:
+                        print(f"⚠ Web leaderboard server responded with status {response.status}")
+                        if attempt < max_retries:
+                            await asyncio.sleep(0.5)  # Brief retry delay
+                            continue
+                        return False
+                        
+        except Exception as e:
+            if attempt < max_retries:
+                await asyncio.sleep(0.5)  # Brief retry delay
+                continue
+            else:
+                # Only print error on final attempt to avoid spam
+                print(f"Note: Could not update web leaderboard server: {str(e)[:50]}...")
+                return False
+    
+    return False
 
 
-async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None, leaderboard_port: int = 5000):
+async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None, leaderboard_port: int = 5001):
     """Run continuous matchmaking system."""
     global running, manager, matchmaker, stop_event
     

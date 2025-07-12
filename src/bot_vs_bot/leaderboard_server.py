@@ -315,10 +315,19 @@ LEADERBOARD_HTML = """
             margin-left: 10px;
             animation: pulse 2s infinite;
         }
+        .update-indicator.flash {
+            background: #ff6b6b;
+            animation: flash 0.8s ease-out;
+        }
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
+        }
+        @keyframes flash {
+            0% { background: #ff6b6b; transform: scale(1.2); }
+            50% { background: #ffa500; transform: scale(1.4); }
+            100% { background: #28a745; transform: scale(1); }
         }
         .stats-bar {
             display: flex;
@@ -463,7 +472,7 @@ LEADERBOARD_HTML = """
         
         <div class="persistence-note">
             📊 This leaderboard accumulates statistics across all battle sessions - stats persist between runs!
-            <span class="update-indicator" title="Real-time updates every 5 seconds"></span>
+            <span class="update-indicator" title="Real-time updates every 3 seconds - flashes on new battles"></span>
         </div>
         
         <div class="stats-bar">
@@ -583,10 +592,28 @@ LEADERBOARD_HTML = """
             document.getElementById('leaderboard-content').innerHTML = table;
         }
         
+        let lastBattleCount = 0;
+        
         function updateStats(stats) {
             if (!stats) return;
             
-            document.getElementById('total-battles').textContent = stats.total_battles || 0;
+            const currentBattleCount = stats.total_battles || 0;
+            
+            // Check if battle count increased (new battle completed)
+            if (currentBattleCount > lastBattleCount) {
+                // Flash the update indicator
+                const indicator = document.querySelector('.update-indicator');
+                indicator.classList.add('flash');
+                setTimeout(() => indicator.classList.remove('flash'), 800);
+                
+                // Show notification for new battle
+                if (lastBattleCount > 0) {  // Don't show on initial load
+                    console.log(`🆕 New battle completed! Total battles: ${currentBattleCount}`);
+                }
+            }
+            lastBattleCount = currentBattleCount;
+            
+            document.getElementById('total-battles').textContent = currentBattleCount;
             document.getElementById('active-bots').textContent = stats.active_bots || 0;
             document.getElementById('battles-today').textContent = stats.battles_today || 0;
             document.getElementById('avg-duration').textContent = stats.avg_duration || 0;
@@ -621,8 +648,15 @@ LEADERBOARD_HTML = """
         // Initial load
         refreshData();
         
-        // Auto-refresh every 5 seconds for real-time updates
-        setInterval(refreshData, 5000);
+        // Auto-refresh every 3 seconds for more responsive updates
+        setInterval(refreshData, 3000);
+        
+        // Also check for updates when page becomes visible again
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                refreshData();
+            }
+        });
     </script>
 </body>
 </html>
@@ -661,6 +695,8 @@ def api_update():
     """API endpoint to update leaderboard data."""
     try:
         data = request.get_json()
+        new_battles = 0
+        updated_bots = 0
         
         if 'bot_stats' in data:
             for username, stats_data in data['bot_stats'].items():
@@ -671,6 +707,7 @@ def api_update():
                     username=username,
                     **stats_copy
                 )
+                updated_bots += 1
         
         if 'battle_results' in data:
             for result_data in data['battle_results']:
@@ -680,14 +717,27 @@ def api_update():
                     existing_ids = {b.battle_id for b in leaderboard_manager.battle_history}
                     if result.battle_id not in existing_ids:
                         leaderboard_manager.battle_history.append(result)
+                        new_battles += 1
                 except Exception as e:
                     print(f"Error processing battle result: {e}")
                     continue
         
         leaderboard_manager.save_data()
-        return jsonify({'status': 'success'})
+        
+        # Log successful update
+        total_battles = data.get('total_battles', len(leaderboard_manager.battle_history))
+        timestamp = data.get('timestamp', 'unknown')
+        print(f"📊 Leaderboard updated: {updated_bots} bots, {new_battles} new battles (Total: {total_battles})")
+        
+        return jsonify({
+            'status': 'success',
+            'new_battles': new_battles,
+            'updated_bots': updated_bots,
+            'total_battles': total_battles
+        })
         
     except Exception as e:
+        print(f"❌ Error updating leaderboard: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
 

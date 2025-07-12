@@ -73,8 +73,9 @@ def run_play_format():
 
 def run_leaderboard_server():
     """Run leaderboard server."""
-    from src.bot_vs_bot.leaderboard_server import main
-    return main()
+    from src.bot_vs_bot.leaderboard_server import run_server
+    run_server()
+    return 0
 
 
 def run_demo_leaderboard():
