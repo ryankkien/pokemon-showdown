@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import LiveBattle from './components/LiveBattle'
 import ShowdownBattle from './components/ShowdownBattle'
 import Leaderboard from './components/Leaderboard'
-import ChatIntegration from './components/ChatIntegration'
 import BattleScheduler from './components/BattleScheduler'
 import './App.css'
 
@@ -84,9 +83,6 @@ function App() {
             )}
           </div>
 
-          <div className="right-panel">
-            <ChatIntegration />
-          </div>
         </div>
       </main>
     </div>
