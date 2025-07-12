@@ -1,0 +1,177 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: pokemon-showdown-db
+    environment:
+      POSTGRES_DB: pokemon_showdown
+      POSTGRES_USER: psuser
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-defaultpassword123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psuser -d pokemon_showdown"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - pokemon_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: pokemon-showdown-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - pokemon_network
+
+  # Pokemon Showdown Server
+  showdown-server:
+    image: pokemon-showdown-llm:latest
+    container_name: pokemon-showdown-server
+    command: ["node", "pokemon-showdown", "start", "--port", "8000"]
+    working_dir: /app/server/pokemon-showdown
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - pokemon_network
+    depends_on:
+      - postgres
+      - redis
+
+  # Battle Engine Service
+  battle-engine:
+    image: pokemon-showdown-llm:latest
+    container_name: pokemon-battle-engine
+    command: ["python", "-m", "src.bot_vs_bot.run_bot_vs_bot", "--continuous"]
+    environment:
+      - DATABASE_URL=postgresql://psuser:${POSTGRES_PASSWORD:-defaultpassword123}@postgres:5432/pokemon_showdown
+      - REDIS_URL=redis://redis:6379
+      - SHOWDOWN_SERVER_URL=http://showdown-server:8000
+      - ENVIRONMENT=production
+    volumes:
+      - battle_logs:/app/logs
+      - battle_results:/app/results
+      - battle_analysis:/app/battle_analysis
+    networks:
+      - pokemon_network
+    depends_on:
+      showdown-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Leaderboard API Service
+  leaderboard-api:
+    image: pokemon-showdown-llm:latest
+    container_name: pokemon-leaderboard-api
+    command: ["python", "-m", "src.bot_vs_bot.leaderboard_server", "--host", "0.0.0.0", "--port", "5000"]
+    environment:
+      - DATABASE_URL=postgresql://psuser:${POSTGRES_PASSWORD:-defaultpassword123}@postgres:5432/pokemon_showdown
+      - REDIS_URL=redis://redis:6379
+      - ENVIRONMENT=production
+      - CORS_ORIGINS=*
+    ports:
+      - "5000:5000"
+    volumes:
+      - battle_logs:/app/logs
+      - battle_results:/app/results
+    networks:
+      - pokemon_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: pokemon-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    networks:
+      - pokemon_network
+    depends_on:
+      - leaderboard-api
+      - showdown-server
+    restart: unless-stopped
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pokemon-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - pokemon_network
+    profiles:
+      - monitoring
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pokemon-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - pokemon_network
+    profiles:
+      - monitoring
+
+volumes:
+  postgres_data:
+  redis_data:
+  battle_logs:
+  battle_results:
+  battle_analysis:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  pokemon_network:
+    driver: bridge

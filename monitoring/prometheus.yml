@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Pokemon Showdown LLM Services
+  - job_name: 'leaderboard-api'
+    static_configs:
+      - targets: ['leaderboard-api:5000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'showdown-server'
+    static_configs:
+      - targets: ['showdown-server:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Infrastructure monitoring
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Self monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
