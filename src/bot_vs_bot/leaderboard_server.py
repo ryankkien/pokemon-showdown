@@ -292,37 +292,99 @@ LEADERBOARD_HTML = """
         .header {
             text-align: center;
             margin-bottom: 32px;
-            padding: 40px 24px;
-            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #dc2626 100%);
-            border-radius: 16px;
-            border: 1px solid #27272a;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 48px 24px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c2d12 20%, #dc2626 50%, #fbbf24 80%, #065f46 100%);
+            border-radius: 20px;
+            border: 2px solid #fbbf24;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(251, 191, 36, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
         
         .header h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(45deg, #fbbf24, #f59e0b, #dc2626);
+            font-size: 3.75rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #ffffff;
+            text-shadow: 
+                2px 2px 4px rgba(0, 0, 0, 0.7),
+                0 0 20px rgba(251, 191, 36, 0.5),
+                0 0 40px rgba(59, 130, 246, 0.3);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        
+        .pokemon-logo {
+            display: inline-block;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b, #ef4444, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
         
         .header p {
-            font-size: 1.25rem;
-            opacity: 0.8;
-            color: #d1d5db;
-            font-weight: 500;
+            font-size: 1.5rem;
+            color: #f1f5f9;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         
         .subtitle {
-            font-size: 0.875rem;
-            opacity: 0.6;
-            color: #9ca3af;
+            font-size: 1rem;
+            color: #cbd5e1;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
             margin-top: 4px;
         }
+        
+        .pokemon-elements {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .type-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .type-electric { background: linear-gradient(135deg, #f7cc02, #fbbf24); color: #1f2937; }
+        .type-fire { background: linear-gradient(135deg, #ff7c02, #ef4444); color: #ffffff; }
+        .type-water { background: linear-gradient(135deg, #4592c4, #3b82f6); color: #ffffff; }
+        .type-psychic { background: linear-gradient(135deg, #f366b9, #ec4899); color: #ffffff; }
         
         .status-bar {
             background: #18181b;
@@ -583,17 +645,43 @@ LEADERBOARD_HTML = """
             .container {
                 padding: 16px;
             }
+            .header {
+                padding: 40px 20px;
+            }
             .header h1 {
-                font-size: 2.5rem;
+                font-size: 2.75rem;
+            }
+            .header p {
+                font-size: 1.25rem;
             }
             .stats-grid {
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
+            .pokemon-elements {
+                gap: 16px;
+            }
         }
         
         @media (max-width: 768px) {
+            .header {
+                padding: 32px 16px;
+            }
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.25rem;
+            }
+            .header p {
+                font-size: 1.125rem;
+            }
+            .subtitle {
+                font-size: 0.875rem;
+            }
+            .pokemon-elements {
+                gap: 12px;
+                margin-top: 12px;
+            }
+            .type-badge {
+                font-size: 0.625rem;
+                padding: 4px 8px;
             }
             .controls {
                 flex-direction: column;
@@ -610,14 +698,33 @@ LEADERBOARD_HTML = """
                 display: none;
             }
         }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.875rem;
+            }
+            .pokemon-elements {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚡ Pokemon Showdown</h1>
-            <p>LLM Battle Rankings</p>
-            <div class="subtitle">Competitive AI Model Performance</div>
+            <div class="header-content">
+                <h1><span class="pokemon-logo">Pokémon</span> Showdown</h1>
+                <p>🧠 LLM Battle Rankings</p>
+                <div class="subtitle">Where AI Models Compete in Strategic Combat</div>
+                <div class="pokemon-elements">
+                    <div class="type-badge type-electric">⚡ AI Battle</div>
+                    <div class="type-badge type-fire">🔥 Live Rankings</div>
+                    <div class="type-badge type-water">💧 Real-time</div>
+                    <div class="type-badge type-psychic">🔮 Competitive</div>
+                </div>
+            </div>
         </div>
         
         <div class="status-bar">
