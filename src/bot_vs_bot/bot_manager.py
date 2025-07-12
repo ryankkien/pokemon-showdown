@@ -107,9 +107,9 @@ class BotManager:
                              if k not in ['description', 'model']}
             
             # Create account configuration for the username
-            # For localhost, we don't need authentication
+            # For localhost, use empty password instead of None
             if self.server_config == LocalhostServerConfiguration:
-                account_config = None
+                account_config = AccountConfiguration(config.username, "")
             else:
                 account_config = AccountConfiguration(config.username, None)
             
@@ -127,10 +127,6 @@ class BotManager:
                 server_configuration=self.server_config,
                 **filtered_config
             )
-            
-            # For localhost, manually set the username after creation
-            if self.server_config == LocalhostServerConfiguration:
-                bot._username = config.username
             
             # Store bot reference
             self.active_bots[config.username] = bot
