@@ -11,6 +11,7 @@ from enum import Enum
 
 from src.bot_vs_bot.bot_manager import BotConfig
 from src.bot_vs_bot.bot_matchmaker import MatchmakingStrategy
+from src.bot.play_format import SUPPORTED_RANDOM_BATTLE_FORMATS
 
 
 class TournamentType(Enum):
@@ -232,6 +233,14 @@ class BotVsBotConfigManager:
         if len(usernames) != len(set(usernames)):
             issues.append("Bot usernames must be unique")
         
+        # Check battle formats
+        for bot in self.config.bot_configs:
+            if bot.battle_format not in SUPPORTED_RANDOM_BATTLE_FORMATS:
+                issues.append(f"Unsupported battle format: {bot.battle_format} for bot {bot.username}")
+        
+        if self.config.default_battle_format not in SUPPORTED_RANDOM_BATTLE_FORMATS:
+            issues.append(f"Unsupported default battle format: {self.config.default_battle_format}")
+        
         # Check tournament configuration
         if self.config.tournament_config:
             if len(self.config.bot_configs) < 2:
@@ -239,6 +248,9 @@ class BotVsBotConfigManager:
             
             if len(self.config.bot_configs) > self.config.tournament_config.max_participants:
                 issues.append("More bots configured than tournament allows")
+            
+            if self.config.tournament_config.battle_format not in SUPPORTED_RANDOM_BATTLE_FORMATS:
+                issues.append(f"Unsupported tournament battle format: {self.config.tournament_config.battle_format}")
         
         return issues
     

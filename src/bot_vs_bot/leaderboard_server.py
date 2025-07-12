@@ -16,6 +16,7 @@ from flask_cors import CORS
 
 from src.bot_vs_bot.bot_matchmaker import BotMatchmaker, BotStats
 from src.bot_vs_bot.bot_manager import BattleResult
+from src.bot.play_format import SUPPORTED_RANDOM_BATTLE_FORMATS
 
 
 @dataclass
@@ -116,16 +117,26 @@ class LeaderboardManager:
         
         self.save_data()
     
-    def get_leaderboard(self, sort_by: str = "elo", limit: int = 50) -> List[LeaderboardEntry]:
+    def get_leaderboard(self, sort_by: str = "elo", limit: int = 50, battle_format: str = "all") -> List[LeaderboardEntry]:
         """Generate enhanced leaderboard with detailed statistics."""
         entries = []
         
         for username, stats in self.bot_stats.items():
-            # Calculate recent form (last 5 battles)
-            recent_battles = [
+            # Filter battles by format if specified
+            user_battles = [
                 b for b in self.battle_history 
                 if (b.bot1_username == username or b.bot2_username == username)
-            ][-5:]
+            ]
+            
+            if battle_format != "all":
+                user_battles = [b for b in user_battles if b.battle_format == battle_format]
+            
+            # Skip if no battles in this format
+            if battle_format != "all" and not user_battles:
+                continue
+            
+            # Calculate recent form (last 5 battles)
+            recent_battles = user_battles[-5:]
             
             recent_form = ""
             for battle in recent_battles:
@@ -159,15 +170,10 @@ class LeaderboardManager:
             
             favorite_format = max(format_counts.items(), key=lambda x: x[1])[0] if format_counts else "N/A"
             
-            # Calculate win streaks
+            # Calculate win streaks using filtered battles
             current_streak = 0
             longest_win_streak = 0
             temp_streak = 0
-            
-            user_battles = [
-                b for b in self.battle_history 
-                if (b.bot1_username == username or b.bot2_username == username)
-            ]
             
             for battle in reversed(user_battles):
                 if battle.winner == username:
@@ -405,6 +411,16 @@ LEADERBOARD_HTML = """
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+        }
+        
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-controls select {
+            min-width: 120px;
         }
         
         .sort-buttons {
@@ -667,6 +683,12 @@ LEADERBOARD_HTML = """
                 <button class="btn" onclick="sortBy('win_rate')">Win Rate</button>
                 <button class="btn" onclick="sortBy('battles')">Most Battles</button>
             </div>
+            <div class="filter-controls">
+                <label for="format-filter" style="color: #a1a1aa; margin-right: 8px;">Mode:</label>
+                <select id="format-filter" class="btn" onchange="filterByFormat()">
+                    <option value="all">All Modes</option>
+                </select>
+            </div>
             <div class="refresh-info">
                 <button class="btn" onclick="refreshData()">↻ Refresh</button>
             </div>
@@ -684,10 +706,11 @@ LEADERBOARD_HTML = """
 
     <script>
         let currentSort = 'elo';
+        let currentFormat = 'all';
         
-        async function fetchLeaderboard(sortBy = 'elo') {
+        async function fetchLeaderboard(sortBy = 'elo', formatFilter = 'all') {
             try {
-                const response = await fetch(`/api/leaderboard?sort=${sortBy}`);
+                const response = await fetch(`/api/leaderboard?sort=${sortBy}&format=${formatFilter}`);
                 const data = await response.json();
                 return data;
             } catch (error) {
@@ -735,11 +758,35 @@ LEADERBOARD_HTML = """
                 .replace(/\b\w/g, l => l.toUpperCase());
         }
         
+        function populateFormatFilter(availableFormats) {
+            const select = document.getElementById('format-filter');
+            select.innerHTML = '';
+            
+            availableFormats.forEach(format => {
+                const option = document.createElement('option');
+                option.value = format;
+                if (format === 'all') {
+                    option.textContent = 'All Modes';
+                } else {
+                    option.textContent = format.replace('randombattle', ' Random').replace('random', ' Random').replace('gen', 'Gen ');
+                }
+                if (format === currentFormat) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+        
         function renderLeaderboard(data) {
             if (!data || !data.leaderboard) {
                 document.getElementById('leaderboard-content').innerHTML = 
                     '<div class="loading"><div class="loading-spinner"></div>No ranking data available</div>';
                 return;
+            }
+            
+            // Update format filter options
+            if (data.available_formats) {
+                populateFormatFilter(data.available_formats);
             }
             
             const table = `
@@ -823,13 +870,21 @@ LEADERBOARD_HTML = """
             });
             event.target.className = 'btn btn-primary';
             
-            const data = await fetchLeaderboard(type);
+            const data = await fetchLeaderboard(type, currentFormat);
+            renderLeaderboard(data);
+        }
+        
+        async function filterByFormat() {
+            const select = document.getElementById('format-filter');
+            currentFormat = select.value;
+            
+            const data = await fetchLeaderboard(currentSort, currentFormat);
             renderLeaderboard(data);
         }
         
         async function refreshData() {
             const [leaderboardData, statsData] = await Promise.all([
-                fetchLeaderboard(currentSort),
+                fetchLeaderboard(currentSort, currentFormat),
                 fetchStats()
             ]);
             
@@ -866,13 +921,16 @@ def api_leaderboard():
     """API endpoint for leaderboard data."""
     sort_by = request.args.get('sort', 'elo')
     limit = int(request.args.get('limit', 50))
+    battle_format = request.args.get('format', 'all')
     
-    leaderboard = leaderboard_manager.get_leaderboard(sort_by, limit)
+    leaderboard = leaderboard_manager.get_leaderboard(sort_by, limit, battle_format)
     
     return jsonify({
         'leaderboard': [asdict(entry) for entry in leaderboard],
         'sort_by': sort_by,
-        'total_bots': len(leaderboard_manager.bot_stats)
+        'battle_format': battle_format,
+        'total_bots': len(leaderboard_manager.bot_stats),
+        'available_formats': ['all'] + SUPPORTED_RANDOM_BATTLE_FORMATS
     })
 
 

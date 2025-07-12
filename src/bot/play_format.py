@@ -24,6 +24,21 @@ FORMATS = {
     "gen8doubles": "gen8randomdoublesbattle"
 }
 
+# All supported random battle formats for validation
+SUPPORTED_RANDOM_BATTLE_FORMATS = [
+    "gen9randombattle",
+    "gen8randombattle", 
+    "gen7randombattle",
+    "gen6randombattle",
+    "gen5randombattle",
+    "gen4randombattle",
+    "gen3randombattle",
+    "gen2randombattle", 
+    "gen1randombattle",
+    "gen9randomdoublesbattle",
+    "gen8randomdoublesbattle"
+]
+
 FORMAT_DESCRIPTIONS = {
     "gen9": "Current generation (Scarlet/Violet)",
     "gen8": "Sword/Shield generation", 
