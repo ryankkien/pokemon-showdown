@@ -260,205 +260,354 @@ leaderboard_manager = LeaderboardManager()
 # HTML template for leaderboard
 LEADERBOARD_HTML = """
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon Showdown Bot Leaderboard</title>
+    <title>Pokemon Showdown - LLM Rankings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0c0a09;
+            color: #fafaf9;
             min-height: 100vh;
+            line-height: 1.5;
         }
+        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
+            padding: 24px;
         }
+        
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 30px;
             text-align: center;
+            margin-bottom: 32px;
+            padding: 40px 24px;
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #dc2626 100%);
+            border-radius: 16px;
+            border: 1px solid #27272a;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
+        
         .header h1 {
-            margin: 0;
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
+        
         .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-            font-size: 1.1rem;
+            font-size: 1.25rem;
+            opacity: 0.8;
+            color: #d1d5db;
+            font-weight: 500;
         }
-        .persistence-note {
-            background: #e8f5e8;
-            color: #2d5a2d;
-            padding: 10px;
-            text-align: center;
-            font-size: 0.9rem;
-            border-left: 4px solid #28a745;
-            margin: 0;
+        
+        .subtitle {
+            font-size: 0.875rem;
+            opacity: 0.6;
+            color: #9ca3af;
+            margin-top: 4px;
         }
+        
+        .status-bar {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #a1a1aa;
+            font-size: 0.875rem;
+        }
+        
         .update-indicator {
             display: inline-block;
             width: 8px;
             height: 8px;
-            background: #28a745;
+            background: #22c55e;
             border-radius: 50%;
-            margin-left: 10px;
             animation: pulse 2s infinite;
         }
+        
         .update-indicator.flash {
-            background: #ff6b6b;
+            background: #ef4444;
             animation: flash 0.8s ease-out;
         }
+        
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
+        
         @keyframes flash {
-            0% { background: #ff6b6b; transform: scale(1.2); }
-            50% { background: #ffa500; transform: scale(1.4); }
-            100% { background: #28a745; transform: scale(1); }
+            0% { background: #ef4444; transform: scale(1.2); }
+            50% { background: #f97316; transform: scale(1.4); }
+            100% { background: #22c55e; transform: scale(1); }
         }
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
             padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .stat {
             text-align: center;
         }
+        
         .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #2d3436;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #fafaf9;
+            margin-bottom: 4px;
         }
+        
         .stat-label {
-            color: #636e72;
-            font-size: 0.9rem;
-            margin-top: 5px;
+            color: #a1a1aa;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
+        
         .controls {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
             padding: 20px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8f9fa;
+            flex-wrap: wrap;
+            gap: 16px;
         }
+        
         .sort-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
+        
         .btn {
             padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
+            border: 1px solid #27272a;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.2s;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: #09090b;
+            color: #a1a1aa;
         }
+        
         .btn-primary {
-            background: #0984e3;
-            color: white;
+            background: #2563eb;
+            color: #f8fafc;
+            border-color: #2563eb;
         }
+        
         .btn-primary:hover {
-            background: #0770c2;
+            background: #1d4ed8;
+            border-color: #1d4ed8;
         }
-        .btn-secondary {
-            background: #ddd;
-            color: #333;
+        
+        .btn:hover {
+            background: #27272a;
+            color: #fafaf9;
         }
-        .btn-secondary:hover {
-            background: #ccc;
-        }
+        
         .refresh-info {
-            color: #636e72;
-            font-size: 0.9rem;
+            color: #71717a;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+        
+        .leaderboard-container {
+            background: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
         }
+        
         th, td {
-            padding: 12px;
+            padding: 16px 20px;
             text-align: left;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #27272a;
         }
+        
         th {
-            background: #f8f9fa;
+            background: #09090b;
             font-weight: 600;
-            color: #2d3436;
+            color: #fafaf9;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             position: sticky;
             top: 0;
         }
-        tr:hover {
-            background: #f8f9fa;
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
         }
+        
+        tbody tr:hover {
+            background: #27272a;
+        }
+        
         .rank {
-            font-weight: bold;
-            color: #e17055;
+            font-weight: 700;
+            font-size: 1.125rem;
         }
-        .rank-1 { color: #fdcb6e; }
-        .rank-2 { color: #a29bfe; }
-        .rank-3 { color: #fd79a8; }
-        .username {
+        
+        .rank-1 { color: #fbbf24; }
+        .rank-2 { color: #94a3b8; }
+        .rank-3 { color: #fb7185; }
+        .rank { color: #a1a1aa; }
+        
+        .model-name {
             font-weight: 600;
-            color: #2d3436;
+            color: #fafaf9;
+            font-size: 1rem;
         }
+        
+        .provider-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .openai { background: #065f46; color: #ecfdf5; }
+        .anthropic { background: #7c2d12; color: #fef2f2; }
+        .google { background: #1e40af; color: #eff6ff; }
+        
         .elo {
-            font-weight: bold;
-            color: #00b894;
+            font-weight: 700;
+            color: #22c55e;
+            font-size: 1.125rem;
         }
+        
+        .record {
+            color: #d1d5db;
+            font-weight: 500;
+        }
+        
         .win-rate {
-            color: #0984e3;
+            font-weight: 600;
+            color: #3b82f6;
         }
+        
         .recent-form {
-            font-family: monospace;
-            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            letter-spacing: 0.1em;
         }
-        .recent-form .win { color: #00b894; }
-        .recent-form .loss { color: #e17055; }
-        .recent-form .draw { color: #fdcb6e; }
+        
+        .recent-form .win { color: #22c55e; }
+        .recent-form .loss { color: #ef4444; }
+        .recent-form .draw { color: #f59e0b; }
+        
         .streak {
-            background: #00b894;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            background: #22c55e;
+            color: #052e16;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
+        
+        .last-battle {
+            color: #71717a;
+            font-size: 0.875rem;
+        }
+        
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #636e72;
+            padding: 80px 20px;
+            color: #71717a;
         }
-        @media (max-width: 768px) {
+        
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #27272a;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1024px) {
             .container {
-                margin: 10px;
+                padding: 16px;
             }
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
             }
-            .stats-bar {
-                flex-wrap: wrap;
-            }
             .controls {
                 flex-direction: column;
-                gap: 15px;
+                align-items: stretch;
             }
-            table {
-                font-size: 0.9rem;
+            .sort-buttons {
+                justify-content: center;
+            }
+            th, td {
+                padding: 12px 16px;
+                font-size: 0.875rem;
+            }
+            .provider-badge {
+                display: none;
             }
         }
     </style>
@@ -466,29 +615,35 @@ LEADERBOARD_HTML = """
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 Bot Battle Leaderboard</h1>
-            <p>Pokemon Showdown AI Tournament Rankings</p>
+            <h1>⚡ Pokemon Showdown</h1>
+            <p>LLM Battle Rankings</p>
+            <div class="subtitle">Competitive AI Model Performance</div>
         </div>
         
-        <div class="persistence-note">
-            📊 This leaderboard accumulates statistics across all battle sessions - stats persist between runs!
-            <span class="update-indicator" title="Real-time updates every 3 seconds - flashes on new battles"></span>
+        <div class="status-bar">
+            <div class="status-info">
+                📊 Real-time rankings • Persistent across sessions
+                <span class="update-indicator" title="Live updates every 3 seconds"></span>
+            </div>
+            <div class="status-info">
+                <span id="last-update">Loading...</span>
+            </div>
         </div>
         
-        <div class="stats-bar">
-            <div class="stat">
+        <div class="stats-grid">
+            <div class="stat-card">
                 <div class="stat-value" id="total-battles">-</div>
                 <div class="stat-label">Total Battles</div>
             </div>
-            <div class="stat">
+            <div class="stat-card">
                 <div class="stat-value" id="active-bots">-</div>
-                <div class="stat-label">Active Bots</div>
+                <div class="stat-label">LLM Models</div>
             </div>
-            <div class="stat">
+            <div class="stat-card">
                 <div class="stat-value" id="battles-today">-</div>
                 <div class="stat-label">Battles Today</div>
             </div>
-            <div class="stat">
+            <div class="stat-card">
                 <div class="stat-value" id="avg-duration">-</div>
                 <div class="stat-label">Avg Duration (s)</div>
             </div>
@@ -497,18 +652,22 @@ LEADERBOARD_HTML = """
         <div class="controls">
             <div class="sort-buttons">
                 <button class="btn btn-primary" onclick="sortBy('elo')">ELO Rating</button>
-                <button class="btn btn-secondary" onclick="sortBy('wins')">Most Wins</button>
-                <button class="btn btn-secondary" onclick="sortBy('win_rate')">Win Rate</button>
-                <button class="btn btn-secondary" onclick="sortBy('battles')">Most Battles</button>
+                <button class="btn" onclick="sortBy('wins')">Most Wins</button>
+                <button class="btn" onclick="sortBy('win_rate')">Win Rate</button>
+                <button class="btn" onclick="sortBy('battles')">Most Battles</button>
             </div>
             <div class="refresh-info">
-                <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh</button>
-                <span id="last-update">Last updated: -</span>
+                <button class="btn" onclick="refreshData()">↻ Refresh</button>
             </div>
         </div>
         
-        <div id="leaderboard-content">
-            <div class="loading">Loading leaderboard...</div>
+        <div class="leaderboard-container">
+            <div id="leaderboard-content">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading LLM rankings...
+                </div>
+            </div>
         </div>
     </div>
 
@@ -546,10 +705,29 @@ LEADERBOARD_HTML = """
             }).join('');
         }
         
+        function getProviderBadge(modelName) {
+            if (modelName.toLowerCase().includes('gpt') || modelName.toLowerCase().includes('openai')) {
+                return '<span class="provider-badge openai">OpenAI</span>';
+            } else if (modelName.toLowerCase().includes('claude') || modelName.toLowerCase().includes('anthropic')) {
+                return '<span class="provider-badge anthropic">Anthropic</span>';
+            } else if (modelName.toLowerCase().includes('gemini') || modelName.toLowerCase().includes('google')) {
+                return '<span class="provider-badge google">Google</span>';
+            }
+            return '';
+        }
+        
+        function formatModelName(username) {
+            // Clean up model names for better display
+            return username
+                .replace(/^(GPT|Claude|Gemini)-/, '$1 ')
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+        
         function renderLeaderboard(data) {
             if (!data || !data.leaderboard) {
                 document.getElementById('leaderboard-content').innerHTML = 
-                    '<div class="loading">No data available</div>';
+                    '<div class="loading"><div class="loading-spinner"></div>No ranking data available</div>';
                 return;
             }
             
@@ -558,12 +736,12 @@ LEADERBOARD_HTML = """
                     <thead>
                         <tr>
                             <th>Rank</th>
-                            <th>Bot Name</th>
-                            <th>ELO Rating</th>
+                            <th>LLM Model</th>
+                            <th>ELO</th>
                             <th>Record</th>
                             <th>Win Rate</th>
-                            <th>Recent Form</th>
-                            <th>Current Streak</th>
+                            <th>Form</th>
+                            <th>Streak</th>
                             <th>Last Battle</th>
                         </tr>
                     </thead>
@@ -571,18 +749,21 @@ LEADERBOARD_HTML = """
                         ${data.leaderboard.map(bot => `
                             <tr>
                                 <td class="rank rank-${bot.rank}">#${bot.rank}</td>
-                                <td class="username">${bot.username}</td>
+                                <td class="model-name">
+                                    ${formatModelName(bot.username)}
+                                    ${getProviderBadge(bot.username)}
+                                </td>
                                 <td class="elo">${bot.elo_rating}</td>
-                                <td>${bot.wins}-${bot.losses}-${bot.draws}</td>
+                                <td class="record">${bot.wins}-${bot.losses}-${bot.draws}</td>
                                 <td class="win-rate">${bot.win_rate}%</td>
                                 <td class="recent-form">${formatRecentForm(bot.recent_form)}</td>
                                 <td>
                                     ${bot.current_streak > 0 ? 
                                         `<span class="streak">${bot.current_streak}W</span>` : 
-                                        '-'
+                                        '<span class="last-battle">-</span>'
                                     }
                                 </td>
-                                <td>${bot.last_battle}</td>
+                                <td class="last-battle">${bot.last_battle}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -627,7 +808,7 @@ LEADERBOARD_HTML = """
             
             // Update button states
             document.querySelectorAll('.sort-buttons .btn').forEach(btn => {
-                btn.className = 'btn btn-secondary';
+                btn.className = 'btn';
             });
             event.target.className = 'btn btn-primary';
             
