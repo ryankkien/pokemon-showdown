@@ -116,29 +116,21 @@ class BotManager:
             # Extract model from custom_config if it exists
             model = config.custom_config.get('model') if config.custom_config else None
             
-            # For localhost, pass username directly
+            # Create bot with appropriate configuration
+            bot = LLMPlayer(
+                account_configuration=account_config,
+                battle_format=config.battle_format,
+                max_concurrent_battles=config.max_concurrent_battles,
+                use_mock_llm=config.use_mock_llm,
+                llm_provider=config.llm_provider,
+                model=model,
+                server_configuration=self.server_config,
+                **filtered_config
+            )
+            
+            # For localhost, manually set the username after creation
             if self.server_config == LocalhostServerConfiguration:
-                bot = LLMPlayer(
-                    username=config.username,
-                    battle_format=config.battle_format,
-                    max_concurrent_battles=config.max_concurrent_battles,
-                    use_mock_llm=config.use_mock_llm,
-                    llm_provider=config.llm_provider,
-                    model=model,
-                    server_configuration=self.server_config,
-                    **filtered_config
-                )
-            else:
-                bot = LLMPlayer(
-                    account_configuration=account_config,
-                    battle_format=config.battle_format,
-                    max_concurrent_battles=config.max_concurrent_battles,
-                    use_mock_llm=config.use_mock_llm,
-                    llm_provider=config.llm_provider,
-                    model=model,
-                    server_configuration=self.server_config,
-                    **filtered_config
-                )
+                bot._username = config.username
             
             # Store bot reference
             self.active_bots[config.username] = bot
