@@ -12,10 +12,9 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 import logging
 
-from flask import Flask
+from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
-import requests
 
 from src.bot.bot import LLMPlayer
 from src.bot_vs_bot.bot_manager import BotManager, BattleResult
@@ -94,13 +93,13 @@ class BattleRelayServer:
         
         @self.socketio.on('connect')
         def handle_connect():
-            client_id = requests.sid
+            client_id = request.sid
             logger.info(f"Client connected: {client_id}")
             emit('connected', {'client_id': client_id})
         
         @self.socketio.on('disconnect')
         def handle_disconnect():
-            client_id = requests.sid
+            client_id = request.sid
             logger.info(f"Client disconnected: {client_id}")
             # Remove from all battle subscriptions
             for battle_id, subscribers in self.battle_subscribers.items():
@@ -109,7 +108,7 @@ class BattleRelayServer:
         
         @self.socketio.on('subscribeToBattle')
         def handle_subscribe(data):
-            client_id = requests.sid
+            client_id = request.sid
             battle_id = data.get('battleId')
             
             if battle_id:
@@ -130,7 +129,7 @@ class BattleRelayServer:
         
         @self.socketio.on('unsubscribeFromBattle')
         def handle_unsubscribe(data):
-            client_id = requests.sid
+            client_id = request.sid
             battle_id = data.get('battleId')
             
             if battle_id:
