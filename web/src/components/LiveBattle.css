@@ -1,0 +1,264 @@
+.live-battle {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.live-battle.no-battle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-battle-content {
+  text-align: center;
+  color: #71717a;
+}
+
+.no-battle-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  color: #a1a1aa;
+}
+
+.waiting-indicator {
+  margin-top: 24px;
+}
+
+.pulse {
+  width: 40px;
+  height: 40px;
+  background: #2563eb;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.battle-header {
+  background: #09090b;
+  padding: 16px 20px;
+  border-bottom: 1px solid #27272a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.battle-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fafaf9;
+}
+
+.battle-info {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.turn {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.format {
+  color: #a1a1aa;
+  background: #27272a;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.delay-indicator {
+  color: #f59e0b;
+  font-weight: 500;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+.battle-field {
+  flex: 1;
+  display: flex;
+  padding: 20px;
+  gap: 40px;
+  background: #0c0a09;
+  position: relative;
+  overflow: hidden;
+}
+
+.trainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.trainer-info h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fafaf9;
+  margin-bottom: 12px;
+}
+
+.team-preview {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.pokemon-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  background: #18181b;
+  border: 2px solid #27272a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.pokemon-icon.active {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.pokemon-icon.fainted {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.pokemon-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hp-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #27272a;
+}
+
+.hp-fill {
+  height: 100%;
+  background: #22c55e;
+  transition: width 0.3s;
+}
+
+.active-pokemon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.active-pokemon img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+.p2 .active-pokemon img {
+  transform: scaleX(-1);
+}
+
+.pokemon-status {
+  text-align: center;
+}
+
+.pokemon-status .name {
+  font-weight: 600;
+  color: #fafaf9;
+  font-size: 1rem;
+}
+
+.pokemon-status .hp {
+  color: #22c55e;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pokemon-status .status {
+  background: #dc2626;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.battle-log {
+  background: #09090b;
+  border-top: 1px solid #27272a;
+  padding: 16px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.battle-log h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #a1a1aa;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.log-content {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 0.875rem;
+  color: #d1d5db;
+  line-height: 1.5;
+}
+
+.log-entry {
+  padding: 2px 0;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.log-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.log-content::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
+.log-content::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+.log-content::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}

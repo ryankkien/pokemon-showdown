@@ -1,0 +1,164 @@
+.battle-scheduler {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.scheduler-header {
+  background: #09090b;
+  padding: 16px 20px;
+  border-bottom: 1px solid #27272a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scheduler-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fafaf9;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #71717a;
+}
+
+.status-dot.battling {
+  background: #22c55e;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.scheduled {
+  background: #f59e0b;
+}
+
+.status-text {
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+
+.scheduler-content {
+  padding: 20px;
+}
+
+.format-selector {
+  margin-bottom: 20px;
+}
+
+.format-selector label {
+  display: block;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.format-selector select {
+  width: 100%;
+  padding: 8px 12px;
+  background: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  color: #fafaf9;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.format-selector select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-secondary {
+  background: #27272a;
+  color: #fafaf9;
+}
+
+.btn-secondary:hover {
+  background: #3f3f46;
+}
+
+.countdown {
+  text-align: center;
+  padding: 20px;
+}
+
+.countdown p {
+  color: #a1a1aa;
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+}
+
+.countdown-timer {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f59e0b;
+  font-variant-numeric: tabular-nums;
+}
+
+.battle-info {
+  text-align: center;
+  padding: 20px;
+}
+
+.battle-info p {
+  color: #a1a1aa;
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #27272a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #22c55e;
+  width: 30%;
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 30%; }
+}

@@ -488,16 +488,17 @@ async def main():
         leaderboard_thread = None
         if args.leaderboard:
             import threading
-            from src.bot_vs_bot.leaderboard_server import run_server
+            from src.bot_vs_bot.web_battle_server import run_web_server
             
-            print(f"Starting leaderboard server on port {args.leaderboard_port}...")
+            print(f"Starting web battle server on port {args.leaderboard_port}...")
             leaderboard_thread = threading.Thread(
-                target=run_server,
-                args=('localhost', args.leaderboard_port, False),
+                target=run_web_server,
+                args=(args.config, args.leaderboard_port),
                 daemon=True
             )
             leaderboard_thread.start()
-            print(f"🌐 Leaderboard available at: http://localhost:{args.leaderboard_port}")
+            print(f"🌐 Web interface available at: http://localhost:{args.leaderboard_port}")
+            print(f"🔌 Battle relay server on port {args.leaderboard_port + 1}")
         
         # Run selected mode
         if args.mode == "single":

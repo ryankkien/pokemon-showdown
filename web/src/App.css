@@ -1,0 +1,112 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: #18181b;
+  border-bottom: 1px solid #27272a;
+  padding: 24px;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fafaf9;
+  margin-bottom: 8px;
+  letter-spacing: -0.025em;
+}
+
+.app-header p {
+  font-size: 1.25rem;
+  color: #a1a1aa;
+  font-weight: 500;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.battle-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.leaderboard-section {
+  flex: 1;
+  min-height: 400px;
+}
+
+.chat-section {
+  height: 400px;
+}
+
+.chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.chat-toggle button {
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-toggle button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 1200px) {
+  .app-main {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+  }
+  
+  .leaderboard-section,
+  .chat-section {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
+  .sidebar {
+    flex-direction: column;
+  }
+  
+  .chat-section {
+    height: 300px;
+  }
+}
