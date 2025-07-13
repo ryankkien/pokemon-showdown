@@ -15,7 +15,7 @@ const Leaderboard = ({ currentBattle, onDataUpdate }) => {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await axios.get(`/api/leaderboard?sort=${sortBy}&limit=10`)
+      const response = await axios.get(`http://localhost:5000/api/leaderboard?sort=${sortBy}&limit=10`)
       setLeaderboard(response.data.leaderboard)
       onDataUpdate(response.data.leaderboard)
       setLoading(false)

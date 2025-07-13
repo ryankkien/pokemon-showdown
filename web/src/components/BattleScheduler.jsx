@@ -40,7 +40,7 @@ const BattleScheduler = ({ onBattleUpdate }) => {
 
   const checkBattleStatus = async () => {
     try {
-      const response = await axios.get('/api/battle-status')
+      const response = await axios.get('http://localhost:5000/api/battle-status')
       setCurrentStatus(response.data.status)
       
       if (response.data.currentBattle) {
@@ -59,7 +59,7 @@ const BattleScheduler = ({ onBattleUpdate }) => {
 
   const startBattle = async () => {
     try {
-      const response = await axios.post('/api/start-battle', {
+      const response = await axios.post('http://localhost:5000/api/start-battle', {
         format: selectedFormat
       })
       
@@ -74,7 +74,7 @@ const BattleScheduler = ({ onBattleUpdate }) => {
 
   const scheduleNextBattle = async () => {
     try {
-      const response = await axios.post('/api/schedule-battle', {
+      const response = await axios.post('http://localhost:5000/api/schedule-battle', {
         format: selectedFormat,
         delayMinutes: 5
       })
