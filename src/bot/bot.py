@@ -7,6 +7,7 @@ import os
 import asyncio
 import logging
 import json
+import random
 from typing import Dict, Any, Tuple, Optional
 from dotenv import load_dotenv
 
@@ -124,6 +125,12 @@ class LLMPlayer(Player):
                         battle_state_summary=self._get_battle_state_summary(battle),
                         success=True
                     )
+                    
+                    # Add strategic delay between moves (10-15 seconds)
+                    delay = random.uniform(10.0, 15.0)
+                    logger.info(f"Adding strategic delay of {delay:.1f} seconds before executing move", 
+                               extra={'battle_id': battle.battle_tag, 'bot_name': self.username})
+                    await asyncio.sleep(delay)
                     
                     return result
                 
@@ -254,7 +261,6 @@ class LLMPlayer(Player):
         Choose a random move without using special mechanics like Terastallize, Mega, Dynamax, etc.
         This prevents invalid choice errors.
         """
-        import random
         
         # Try to use a regular move first
         if battle.available_moves:
