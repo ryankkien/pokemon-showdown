@@ -13,7 +13,7 @@
     {
       "username": "Gemini-1.5-Flash",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "gemini",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -24,7 +24,7 @@
     {
       "username": "Gemini-1.5-Pro",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "gemini",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -35,7 +35,7 @@
     {
       "username": "Gemini-1.5-Pro-002",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "gemini",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -46,7 +46,7 @@
     {
       "username": "Gemini-2.0-Flash",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "gemini",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -57,7 +57,7 @@
     {
       "username": "GPT-4o",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "openai",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -68,7 +68,7 @@
     {
       "username": "GPT-4o-mini",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "openai",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -79,7 +79,7 @@
     {
       "username": "GPT-4-Turbo",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "openai",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -90,7 +90,7 @@
     {
       "username": "GPT-3.5-Turbo",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "openai",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -101,7 +101,7 @@
     {
       "username": "Claude-3.5-Sonnet",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "anthropic",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -112,7 +112,7 @@
     {
       "username": "Claude-3.5-Haiku",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "anthropic",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -123,7 +123,7 @@
     {
       "username": "Claude-3-Opus",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "anthropic",
       "max_concurrent_battles": 1,
       "custom_config": {
@@ -134,7 +134,7 @@
     {
       "username": "Claude-3-Sonnet",
       "battle_format": "gen9randombattle",
-      "use_mock_llm": false,
+      "use_mock_llm": true,
       "llm_provider": "anthropic",
       "max_concurrent_battles": 1,
       "custom_config": {
