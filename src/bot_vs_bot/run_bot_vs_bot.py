@@ -1,20 +1,26 @@
+#!/usr/bin/env python3
 """
-Main script to run bot vs bot battles with the complete system.
-Handles tournament management, continuous battles, and result tracking.
+Main runner for Pokemon Showdown bot vs bot battles.
+Supports single battles, tournaments, and continuous matchmaking.
 """
 
 import asyncio
+import json
 import logging
-import argparse
 import signal
 import sys
-from typing import Optional
+import time
+import argparse
 from datetime import datetime
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
 
+from src.bot_vs_bot.bot_vs_bot_config import BotVsBotConfigManager, TournamentType, create_quick_battle_config, create_tournament_config
 from src.bot_vs_bot.bot_manager import BotManager
 from src.bot_vs_bot.bot_matchmaker import BotMatchmaker, MatchRequest
-from src.bot_vs_bot.bot_vs_bot_config import BotVsBotConfigManager, TournamentType, create_quick_battle_config, create_tournament_config
 from src.bot_vs_bot.leaderboard_server import LeaderboardManager
+
+if TYPE_CHECKING:
+    from src.bot_vs_bot.web_battle_server import WebBattleServer
 
 
 # Global variables for graceful shutdown
@@ -185,7 +191,7 @@ async def _send_update_to_web_server(matchmaker, port: int = 5001, max_retries: 
     return False
 
 
-async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None, leaderboard_port: int = 5001):
+async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, duration_minutes: Optional[int] = None, leaderboard_port: int = 5001, web_server_instance: Optional['WebBattleServer'] = None):
     """Run continuous matchmaking system."""
     global running, manager, matchmaker, stop_event
     
@@ -196,7 +202,6 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
         print(f"Duration: {duration_minutes} minutes")
     
     # Calculate end time if duration specified
-    import time
     start_time = time.time()
     end_time = start_time + (duration_minutes * 60) if duration_minutes else None
     
@@ -224,6 +229,11 @@ async def run_continuous_matchmaking(config_manager: BotVsBotConfigManager, dura
             await manager.create_bot(bot_config)
             matchmaker.register_bot(bot_config.username)
             print(f"  Created: {bot_config.username}")
+        
+        # Connect web server to continuous matchmaking components
+        if web_server_instance:
+            web_server_instance.set_external_components(manager, matchmaker)
+            print("Web server connected to continuous matchmaking")
         
         # Add initial match requests
         print("Adding initial match requests...")
@@ -484,16 +494,25 @@ async def main():
     print()
     
     try:
-        # Start leaderboard server if requested
+        # Start leaderboard/web server in background if enabled
         leaderboard_thread = None
+        web_server_instance = None
         if args.leaderboard:
             import threading
-            from src.bot_vs_bot.web_battle_server import run_web_server
+            from src.bot_vs_bot.web_battle_server import run_web_server, WebBattleServer
             
             print(f"Starting web battle server on port {args.leaderboard_port}...")
+            
+            # Create web server instance that will integrate with continuous matchmaking
+            config_manager_for_web = BotVsBotConfigManager(args.config)
+            web_server_instance = WebBattleServer(
+                config_manager_for_web, 
+                args.leaderboard_port,
+                use_external_matchmaker=True
+            )
+            
             leaderboard_thread = threading.Thread(
-                target=run_web_server,
-                args=(args.config, args.leaderboard_port),
+                target=web_server_instance.run,
                 daemon=True
             )
             leaderboard_thread.start()
@@ -506,7 +525,7 @@ async def main():
         elif args.mode == "tournament":
             await run_tournament(config_manager)
         elif args.mode == "continuous":
-            await run_continuous_matchmaking(config_manager, args.duration, args.leaderboard_port)
+            await run_continuous_matchmaking(config_manager, args.duration, args.leaderboard_port, web_server_instance)
         elif args.mode == "web":
             # Web mode - just keep the process alive for the web server
             print("Running in web-only mode. Use the web interface to start battles.")

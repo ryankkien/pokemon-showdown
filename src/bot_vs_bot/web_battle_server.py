@@ -32,17 +32,22 @@ class ScheduledBattle:
 class WebBattleServer:
     """Combined web server for battles and leaderboard."""
     
-    def __init__(self, config_manager: BotVsBotConfigManager, port: int = 5000):
+    def __init__(self, config_manager: BotVsBotConfigManager, port: int = 5000, 
+                 use_external_matchmaker: bool = False):
         self.app = Flask(__name__)
         CORS(self.app)
         self.port = port
         self.config_manager = config_manager
+        self.use_external_matchmaker = use_external_matchmaker
         
-        # Components
+        # Components - only create if not using external matchmaker
         self.leaderboard_manager = LeaderboardManager()
         self.bot_manager = None
         self.matchmaker = None
-        self.relay_server = None
+        if not use_external_matchmaker:
+            self.relay_server = start_relay_server(port + 1)
+        else:
+            self.relay_server = None
         
         # Battle management
         self.current_battle = None
@@ -51,11 +56,18 @@ class WebBattleServer:
         self.auto_schedule_enabled = True
         self.battle_delay_minutes = 5
         
+        # External matchmaker references (set by continuous mode)
+        self.external_bot_manager = None
+        self.external_matchmaker = None
+        
         # Setup routes
         self._setup_routes()
-        
-        # Start relay server
-        self.relay_server = start_relay_server(port + 1)
+    
+    def set_external_components(self, bot_manager, matchmaker):
+        """Set external bot manager and matchmaker from continuous mode."""
+        self.external_bot_manager = bot_manager
+        self.external_matchmaker = matchmaker
+        self.use_external_matchmaker = True
         
     def _setup_routes(self):
         """Setup all HTTP routes."""
@@ -87,31 +99,75 @@ class WebBattleServer:
             limit = int(request.args.get('limit', 50))
             battle_format = request.args.get('format', 'all')
             
-            leaderboard = self.leaderboard_manager.get_leaderboard(sort_by, limit, battle_format)
-            
-            # Add battling status to entries
-            for entry in leaderboard:
-                if self.current_battle:
-                    entry.is_battling = (
-                        entry.username == self.current_battle.get('bot1') or 
-                        entry.username == self.current_battle.get('bot2')
+            # Use external matchmaker if available
+            if self.use_external_matchmaker and self.external_matchmaker:
+                # Get data from external matchmaker
+                leaderboard_data = self.external_matchmaker.get_leaderboard()
+                leaderboard = []
+                for i, bot_data in enumerate(leaderboard_data[:limit], 1):
+                    from src.bot_vs_bot.leaderboard_server import LeaderboardEntry
+                    entry = LeaderboardEntry(
+                        rank=i,
+                        username=bot_data['username'],
+                        elo_rating=bot_data['elo_rating'],
+                        wins=bot_data['wins'],
+                        losses=bot_data['losses'],
+                        draws=bot_data['draws'],
+                        total_battles=bot_data['total_battles'],
+                        win_rate=bot_data['win_rate'],
+                        recent_form=bot_data.get('recent_form', ''),
+                        longest_win_streak=bot_data.get('longest_win_streak', 0),
+                        current_streak=bot_data.get('current_streak', 0),
+                        avg_battle_duration=bot_data.get('avg_battle_duration', 0.0),
+                        is_battling=False
                     )
-                else:
-                    entry.is_battling = False
+                    # Check if bot is currently battling
+                    if self.current_battle:
+                        entry.is_battling = (
+                            entry.username == self.current_battle.get('bot1') or 
+                            entry.username == self.current_battle.get('bot2')
+                        )
+                    leaderboard.append(entry)
+            else:
+                # Use internal leaderboard manager
+                leaderboard = self.leaderboard_manager.get_leaderboard(sort_by, limit, battle_format)
+                
+                # Add battling status to entries
+                for entry in leaderboard:
+                    if self.current_battle:
+                        entry.is_battling = (
+                            entry.username == self.current_battle.get('bot1') or 
+                            entry.username == self.current_battle.get('bot2')
+                        )
+                    else:
+                        entry.is_battling = False
             
             return jsonify({
                 'leaderboard': [asdict(entry) for entry in leaderboard],
                 'sort_by': sort_by,
                 'battle_format': battle_format,
-                'total_bots': len(self.leaderboard_manager.bot_stats),
+                'total_bots': len(leaderboard),
                 'available_formats': ['all'] + SUPPORTED_RANDOM_BATTLE_FORMATS
             })
         
         @self.app.route('/api/stats')
         def api_stats():
-            stats = self.leaderboard_manager.get_battle_stats()
-            stats['battle_status'] = self.battle_status
-            stats['current_battle'] = self.current_battle
+            if self.use_external_matchmaker and self.external_matchmaker:
+                # Get stats from external matchmaker
+                total_battles = len(self.external_bot_manager.battle_results) if self.external_bot_manager else 0
+                stats = {
+                    'total_battles': total_battles,
+                    'active_bots': len(self.external_bot_manager.active_bots) if self.external_bot_manager else 0,
+                    'battles_today': total_battles,  # Simplified for now
+                    'avg_duration': 120.0,  # Simplified for now
+                    'battle_status': self.battle_status,
+                    'current_battle': self.current_battle
+                }
+            else:
+                # Use internal leaderboard manager
+                stats = self.leaderboard_manager.get_battle_stats()
+                stats['battle_status'] = self.battle_status
+                stats['current_battle'] = self.current_battle
             return jsonify(stats)
         
         @self.app.route('/api/update', methods=['POST'])
@@ -188,19 +244,60 @@ class WebBattleServer:
                 data = request.get_json()
                 battle_format = data.get('format', 'gen9randombattle')
                 
-                # Start battle in background
-                battle_thread = threading.Thread(
-                    target=self._run_battle_async,
-                    args=(battle_format,),
-                    daemon=True
-                )
-                battle_thread.start()
-                
-                return jsonify({
-                    'success': True,
-                    'message': 'Battle starting...',
-                    'format': battle_format
-                })
+                if self.use_external_matchmaker and self.external_matchmaker:
+                    # Use external matchmaker - add match requests to trigger battles
+                    from src.bot_vs_bot.bot_matchmaker import MatchRequest
+                    import random
+                    
+                    # Select two random bots
+                    available_bots = [config for config in self.config_manager.config.bot_configs 
+                                    if config.username in self.external_bot_manager.active_bots]
+                    
+                    if len(available_bots) < 2:
+                        return jsonify({'success': False, 'error': 'Not enough active bots'}), 400
+                    
+                    selected_bots = random.sample(available_bots, 2)
+                    
+                    # Add match requests for both bots
+                    for bot_config in selected_bots:
+                        request_obj = MatchRequest(
+                            bot_username=bot_config.username,
+                            battle_format=battle_format,
+                            max_wait_time=60.0  # Shorter timeout for web-requested battles
+                        )
+                        self.external_matchmaker.add_match_request(request_obj)
+                    
+                    # Set current battle info for status tracking
+                    self.current_battle = {
+                        'id': f"battle_{int(time.time())}",
+                        'bot1': selected_bots[0].username,
+                        'bot2': selected_bots[1].username,
+                        'format': battle_format,
+                        'startTime': datetime.now().isoformat()
+                    }
+                    self.battle_status = 'battling'
+                    
+                    return jsonify({
+                        'success': True,
+                        'message': 'Battle requests added to matchmaker',
+                        'format': battle_format,
+                        'battle': self.current_battle
+                    })
+                else:
+                    # Use internal battle management (original behavior)
+                    # Start battle in background
+                    battle_thread = threading.Thread(
+                        target=self._run_battle_async,
+                        args=(battle_format,),
+                        daemon=True
+                    )
+                    battle_thread.start()
+                    
+                    return jsonify({
+                        'success': True,
+                        'message': 'Battle starting...',
+                        'format': battle_format
+                    })
                 
             except Exception as e:
                 return jsonify({'success': False, 'error': str(e)}), 500
@@ -213,39 +310,81 @@ class WebBattleServer:
                 battle_format = data.get('format', 'gen9randombattle')
                 delay_minutes = data.get('delayMinutes', 5)
                 
-                # Select two random bots
-                if len(self.config_manager.config.bot_configs) < 2:
-                    return jsonify({'success': False, 'error': 'Not enough bots configured'}), 400
-                
-                import random
-                bots = random.sample(self.config_manager.config.bot_configs, 2)
-                
-                scheduled_time = datetime.now() + timedelta(minutes=delay_minutes)
-                
-                self.scheduled_battle = ScheduledBattle(
-                    bot1=bots[0].username,
-                    bot2=bots[1].username,
-                    format=battle_format,
-                    scheduled_time=scheduled_time
-                )
-                
-                self.battle_status = 'scheduled'
-                
-                # Start scheduler thread
-                scheduler_thread = threading.Thread(
-                    target=self._run_scheduled_battle,
-                    args=(self.scheduled_battle,),
-                    daemon=True
-                )
-                scheduler_thread.start()
-                
-                return jsonify({
-                    'success': True,
-                    'scheduledTime': scheduled_time.isoformat(),
-                    'bot1': bots[0].username,
-                    'bot2': bots[1].username,
-                    'format': battle_format
-                })
+                if self.use_external_matchmaker and self.external_matchmaker:
+                    # For external matchmaker, we just set a scheduled battle
+                    # The continuous matchmaker will handle the actual scheduling
+                    import random
+                    
+                    # Select two random bots
+                    available_bots = [config for config in self.config_manager.config.bot_configs 
+                                    if config.username in self.external_bot_manager.active_bots]
+                    
+                    if len(available_bots) < 2:
+                        return jsonify({'success': False, 'error': 'Not enough active bots'}), 400
+                    
+                    selected_bots = random.sample(available_bots, 2)
+                    
+                    scheduled_time = datetime.now() + timedelta(minutes=delay_minutes)
+                    
+                    self.scheduled_battle = ScheduledBattle(
+                        bot1=selected_bots[0].username,
+                        bot2=selected_bots[1].username,
+                        format=battle_format,
+                        scheduled_time=scheduled_time
+                    )
+                    
+                    self.battle_status = 'scheduled'
+                    
+                    # Start scheduler thread that will add match requests at the scheduled time
+                    scheduler_thread = threading.Thread(
+                        target=self._run_scheduled_battle_external,
+                        args=(self.scheduled_battle,),
+                        daemon=True
+                    )
+                    scheduler_thread.start()
+                    
+                    return jsonify({
+                        'success': True,
+                        'scheduledTime': scheduled_time.isoformat(),
+                        'bot1': selected_bots[0].username,
+                        'bot2': selected_bots[1].username,
+                        'format': battle_format
+                    })
+                else:
+                    # Use internal scheduling (original behavior)
+                    # Select two random bots
+                    if len(self.config_manager.config.bot_configs) < 2:
+                        return jsonify({'success': False, 'error': 'Not enough bots configured'}), 400
+                    
+                    import random
+                    bots = random.sample(self.config_manager.config.bot_configs, 2)
+                    
+                    scheduled_time = datetime.now() + timedelta(minutes=delay_minutes)
+                    
+                    self.scheduled_battle = ScheduledBattle(
+                        bot1=bots[0].username,
+                        bot2=bots[1].username,
+                        format=battle_format,
+                        scheduled_time=scheduled_time
+                    )
+                    
+                    self.battle_status = 'scheduled'
+                    
+                    # Start scheduler thread
+                    scheduler_thread = threading.Thread(
+                        target=self._run_scheduled_battle,
+                        args=(self.scheduled_battle,),
+                        daemon=True
+                    )
+                    scheduler_thread.start()
+                    
+                    return jsonify({
+                        'success': True,
+                        'scheduledTime': scheduled_time.isoformat(),
+                        'bot1': bots[0].username,
+                        'bot2': bots[1].username,
+                        'format': battle_format
+                    })
                 
             except Exception as e:
                 return jsonify({'success': False, 'error': str(e)}), 500
@@ -268,6 +407,47 @@ class WebBattleServer:
         
         # Run the battle
         self._run_battle_async(scheduled_battle.format)
+    
+    def _run_scheduled_battle_external(self, scheduled_battle: ScheduledBattle):
+        """Run a battle at the scheduled time using the external matchmaker."""
+        # Wait until scheduled time
+        wait_time = (scheduled_battle.scheduled_time - datetime.now()).total_seconds()
+        if wait_time > 0:
+            time.sleep(wait_time)
+        
+        # Add match requests for the scheduled battle
+        from src.bot_vs_bot.bot_matchmaker import MatchRequest
+        import random
+        
+        # Select two random bots
+        available_bots = [config for config in self.config_manager.config.bot_configs 
+                        if config.username in self.external_bot_manager.active_bots]
+        
+        if len(available_bots) < 2:
+            print(f"Not enough active bots to schedule battle at {scheduled_battle.scheduled_time}")
+            return
+        
+        selected_bots = random.sample(available_bots, 2)
+        
+        for bot_config in selected_bots:
+            request_obj = MatchRequest(
+                bot_username=bot_config.username,
+                battle_format=scheduled_battle.format,
+                max_wait_time=60.0  # Shorter timeout for web-requested battles
+            )
+            self.external_matchmaker.add_match_request(request_obj)
+        
+        # Set current battle info for status tracking
+        self.current_battle = {
+            'id': f"battle_{int(time.time())}",
+            'bot1': selected_bots[0].username,
+            'bot2': selected_bots[1].username,
+            'format': scheduled_battle.format,
+            'startTime': datetime.now().isoformat()
+        }
+        self.battle_status = 'scheduled'
+        
+        print(f"Scheduled battle at {scheduled_battle.scheduled_time}: {selected_bots[0].username} vs {selected_bots[1].username}")
     
     def _run_battle_async(self, battle_format: str):
         """Run a battle asynchronously."""
