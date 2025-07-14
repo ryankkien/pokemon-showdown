@@ -345,12 +345,18 @@ class WebBattleServer:
                 
             print(f"Active bots after creation: {list(self.bot_manager.active_bots.keys())}")
             
-            # Start battle
-            battle_id = await self.bot_manager.start_bot_battle(
-                bot1_config.username,
-                bot2_config.username,
-                battle_format
-            )
+            # Start battle directly using poke-env's battle method
+            print(f"Starting direct battle between {bot1_config.username} and {bot2_config.username}")
+            
+            bot1 = self.bot_manager.active_bots[bot1_config.username]
+            bot2 = self.bot_manager.active_bots[bot2_config.username]
+            
+            # Use poke-env's battle method to make them fight each other
+            battle_task = asyncio.create_task(bot1.battle_against(bot2, n_battles=1))
+            battle_id = f"battle_{int(time.time())}"
+            
+            print(f"Battle task created, waiting for completion...")
+            await battle_task
             
             # Wait for battle to complete with periodic updates
             max_duration = 600  # 10 minutes max
