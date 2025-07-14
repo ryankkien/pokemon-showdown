@@ -106,12 +106,19 @@ class BotManager:
             filtered_config = {k: v for k, v in config.custom_config.items() 
                              if k not in ['description', 'model']}
             
-            # Create account configuration for the username
-            # For localhost, use empty password instead of None
-            if self.server_config == LocalhostServerConfiguration:
-                account_config = AccountConfiguration(config.username, "")
-            else:
-                account_config = AccountConfiguration(config.username, None)
+            # Generate unique username with UUID to avoid name conflicts
+            # Pokemon Showdown has an 18-character limit for usernames
+            import uuid
+            uuid_suffix = str(uuid.uuid4())[:6]  # Use 6-character UUID for shorter names
+            max_base_length = 18 - len(uuid_suffix) - 1  # -1 for the dash
+            
+            # Truncate base username if needed
+            base_username = config.username[:max_base_length] if len(config.username) > max_base_length else config.username
+            unique_username = f"{base_username}-{uuid_suffix}"
+            
+            # Create account configuration for the unique username
+            # For localhost, create a guest account
+            account_config = AccountConfiguration(unique_username, None)
             
             # Extract model from custom_config if it exists
             model = config.custom_config.get('model') if config.custom_config else None
@@ -128,13 +135,22 @@ class BotManager:
                 **filtered_config
             )
             
-            # Store bot reference
+            # Store bot reference using original username for lookup
             self.active_bots[config.username] = bot
             
             # Give the bot time to establish websocket connection
-            await asyncio.sleep(1.0)
+            logger.info(f"Waiting for bot {config.username} ({unique_username}) to connect...")
+            await asyncio.sleep(3.0)
             
-            logger.info(f"Created bot: {config.username} (format: {config.battle_format})")
+            # Test server connection by sending lobby message
+            try:
+                await bot.test_server_connection()
+                logger.info(f"Bot {config.username} ({unique_username}) confirmed server connection")
+            except Exception as e:
+                logger.warning(f"Bot {config.username} ({unique_username}) failed to send lobby message: {e}")
+                # Continue anyway - the bot might still be able to battle
+            
+            logger.info(f"Created bot: {config.username} ({unique_username}) (format: {config.battle_format})")
             return bot
             
         except Exception as e:
@@ -188,16 +204,31 @@ class BotManager:
                 # Add a small delay to ensure both bots are ready
                 await asyncio.sleep(0.5)
                 
+                # Send lobby messages to confirm bots are ready
+                await bot1.send_lobby_message(f"Challenging {bot2_username} to battle!")
+                await bot2.send_lobby_message(f"Ready to accept challenge from {bot1_username}!")
+                
                 # Create challenge and accept tasks
+                logger.info(f"Bot1 ({bot1_username}) sending challenge...")
                 challenge_task = asyncio.create_task(
                     bot1.send_challenges(bot2_username, 1)
                 )
+                
+                logger.info(f"Bot2 ({bot2_username}) accepting challenge...")
                 accept_task = asyncio.create_task(
                     bot2.accept_challenges(bot1_username, 1)
                 )
                 
                 # Wait for both tasks to complete
+                logger.info("Waiting for challenge/accept tasks to complete...")
                 await asyncio.gather(challenge_task, accept_task)
+                logger.info("Challenge/accept tasks completed")
+                
+                # Alternative: Try direct battle if challenge/accept doesn't work
+                logger.info("Attempting direct battle method as fallback...")
+                battle_task = asyncio.create_task(bot1.battle_against(bot2, n_battles=1))
+                await battle_task
+                logger.info("Direct battle method completed")
                 
             elif mode == BattleMode.LADDER:
                 # Both bots play on ladder (may not guarantee they fight each other)

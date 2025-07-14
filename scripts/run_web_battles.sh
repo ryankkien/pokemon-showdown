@@ -5,6 +5,32 @@
 echo "🚀 Starting Pokemon Showdown LLM Battle Arena..."
 echo ""
 
+# Kill previous processes
+echo "🔄 Killing any existing processes..."
+
+# Kill Pokemon Showdown server processes
+pkill -f "node pokemon-showdown" 2>/dev/null || true
+pkill -f "pokemon-showdown" 2>/dev/null || true
+
+# Kill backend Python processes
+pkill -f "src/bot_vs_bot/run_bot_vs_bot.py" 2>/dev/null || true
+pkill -f "bot_vs_bot" 2>/dev/null || true
+
+# Kill React dev server
+pkill -f "npm run dev" 2>/dev/null || true
+pkill -f "vite" 2>/dev/null || true
+
+# Kill any processes using the specific ports
+lsof -ti :8000 | xargs kill -9 2>/dev/null || true
+lsof -ti :5000 | xargs kill -9 2>/dev/null || true
+lsof -ti :5001 | xargs kill -9 2>/dev/null || true
+lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+
+# Wait a moment for processes to die
+sleep 2
+
+echo "✅ Previous processes killed"
+
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Get the project root (parent of scripts directory)
