@@ -35,7 +35,8 @@ class LLMPlayer(Player):
     """
     
     def __init__(self, battle_format: str = "gen9randombattle", use_mock_llm: bool = False, 
-                 llm_provider: Optional[str] = None, model: Optional[str] = None, **kwargs):
+                 llm_provider: Optional[str] = None, model: Optional[str] = None, 
+                 move_delay: float = 0.0, **kwargs):
         """
         Initialize the LLM player.
         
@@ -44,6 +45,7 @@ class LLMPlayer(Player):
             use_mock_llm: Whether to use mock LLM for testing
             llm_provider: LLM provider to use (gemini, openai, anthropic, etc.)
             model: Specific model to use (e.g., 'gpt-4o', 'claude-3-5-sonnet-20241022')
+            move_delay: Delay in seconds between each move (default: 0.0)
             **kwargs: Additional arguments for the Player class
         """
         super().__init__(battle_format=battle_format, **kwargs)
@@ -51,6 +53,7 @@ class LLMPlayer(Player):
         self.llm_client = create_llm_client(use_mock=use_mock_llm, provider=llm_provider, model=model)
         self.response_parser = ResponseParser()
         self.battle_tracker = battle_tracker  # Reference to global tracker
+        self.move_delay = move_delay  # store the delay value
         
         if not self.llm_client.is_available():
             logger.error("LLM client is not available!")
@@ -124,6 +127,12 @@ class LLMPlayer(Player):
                         battle_state_summary=self._get_battle_state_summary(battle),
                         success=True
                     )
+                    
+                    # apply move delay if configured
+                    if self.move_delay > 0:
+                        logger.info(f"Applying move delay: {self.move_delay}s", 
+                                   extra={'battle_id': battle.battle_tag, 'bot_name': self.username})
+                        await asyncio.sleep(self.move_delay)
                     
                     return result
                 

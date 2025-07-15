@@ -35,6 +35,7 @@ class BotConfig:
     use_mock_llm: bool = False
     llm_provider: Optional[str] = None
     max_concurrent_battles: int = 1
+    move_delay: float = 0.0  # delay in seconds between each move
     custom_config: Dict[str, Any] = None
 
     def __post_init__(self):
@@ -114,6 +115,7 @@ class BotManager:
                 use_mock_llm=config.use_mock_llm,
                 llm_provider=config.llm_provider,
                 model=model,
+                move_delay=config.move_delay,
                 server_configuration=self.server_config,
                 **filtered_config
             )

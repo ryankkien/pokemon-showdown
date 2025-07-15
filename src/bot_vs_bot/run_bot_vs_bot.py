@@ -388,6 +388,8 @@ async def main():
                        help="Filter models to use (e.g., --models gemini openai anthropic)")
     parser.add_argument("--exclude-models", nargs='+', default=None,
                        help="Exclude specific models (e.g., --exclude-models gpt-3.5-turbo)")
+    parser.add_argument("--delay", type=float, default=0.0,
+                       help="Delay in seconds between each move (default: 0.0)")
     
     args = parser.parse_args()
     
@@ -462,6 +464,12 @@ async def main():
             if args.mode == "single":
                 print("Cannot run single battle with only one bot")
                 return
+    
+    # apply move delay to all bot configurations
+    if args.delay > 0:
+        print(f"Applying move delay: {args.delay}s between moves")
+        for bot_config in config_manager.config.bot_configs:
+            bot_config.move_delay = args.delay
     
     # Validate configuration
     issues = config_manager.validate_config()
